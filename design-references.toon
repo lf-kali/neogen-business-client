@@ -1,0 +1,42 @@
+references {
+  item {
+    name: "Dribbble ERP Dashboard"
+    url: "https://dribbble.com/search/erp%20dashboard"
+    source: "dribbble"
+  }
+  item {
+    name: "Dribbble Futuristic Login"
+    url: "https://dribbble.com/search/futuristic%20login"
+    source: "dribbble"
+  }
+  item {
+    name: "Behance ERP UI"
+    url: "https://www.behance.net/search/projects?search=ERP%20UI"
+    source: "behance"
+  }
+  item {
+    name: "Behance SaaS Dashboard"
+    url: "https://www.behance.net/search/projects?search=saas%20dashboard"
+    source: "behance"
+  }
+  item {
+    name: "Awwwards Software & Tech"
+    url: "https://www.awwwards.com/websites/software/"
+    source: "awwwards"
+  }
+  item {
+    name: "CollectUI Sign-up/Login"
+    url: "https://collectui.com/challenges/sign-up"
+    source: "collectui"
+  }
+  item {
+    name: "Mobbin Login Flows"
+    url: "https://mobbin.com/browse/ios/apps/login"
+    source: "mobbin"
+  }
+  item {
+    name: "Muzli SaaS UI Inspiration"
+    url: "https://muz.li/inspiration/saas-ui/"
+    source: "muzli"
+  }
+}
