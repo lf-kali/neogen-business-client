@@ -104,12 +104,6 @@ function ServiceOrderCreate() {
 
             <div className="mt-6 space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg michroma-700 text-slate-900">Componentes</h3>
-                  <p className="text-xs text-slate-500 oxanium-400">
-                    Use o botão abaixo para incluir um novo dispositivo.
-                  </p>
-                </div>
                 <NeogenButton type="button" style={{ backgroundColor: "#111827", width: "auto", paddingLeft: 24, paddingRight: 24 }}>
                   Adicionar dispositivo
                 </NeogenButton>
