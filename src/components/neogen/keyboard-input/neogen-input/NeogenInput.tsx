@@ -28,13 +28,13 @@ function NeogenInput({...props}: neogenInputProps) {
               name={props.name}
               className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
               style={{
-                borderColor: '#e0e0e0',
-                backgroundColor: '#ffffff',
-                color: '#1a1a1a',
+                borderColor: props.inputStyle?.borderColor ? props.inputStyle.borderColor : '#e0e0e0' ,
+                backgroundColor: props.inputStyle?.backgroundColor ? props.inputStyle.backgroundColor : '#ffffff',
+                color: props.inputStyle?.color ? props.inputStyle.color : '#1a1a1a',
                 ...props.inputStyle,
               }}
               onFocus={(e) => (e.target.style.borderColor = '#007bff')}
-              onBlur={(e) => (e.target.style.borderColor = '#e0e0e0')}
+              onBlur={(e) => (e.target.style.borderColor = props.inputStyle?.borderColor ? props.inputStyle.borderColor: '#e0e0e0')}
               placeholder={props.placeholder}
             />
           </div>

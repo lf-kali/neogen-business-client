@@ -2,10 +2,10 @@ import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/Neo
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
 
 function CustomerRegister() {
-  const darkLabelStyle = { color: "rgba(255, 255, 255, 0.75)" };
+  const darkLabelStyle = { color: "rgba(0, 0, 0, 0.75)" };
   const darkInputStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.92)",
-    borderColor: "rgba(255, 255, 255, 0.28)",
+    borderColor: "rgba(0, 0, 0, 0.28)",
     color: "#0f172a",
   };
 
