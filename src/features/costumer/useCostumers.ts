@@ -4,7 +4,7 @@ import { costumerRepository } from "./costumer.repository";
 import type { Costumer } from "./costumer.types";
 
 export function useCostumers() {
-  const [items, setItems] = useState<Costumer[]>([]);
+  const [costumers, setCostumers] = useState<Costumer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
 
@@ -14,7 +14,7 @@ export function useCostumers() {
 
     try {
       const data = await costumerRepository.list();
-      setItems(data);
+      setCostumers(data);
     } catch (e) {
       setError(toApiError(e));
     } finally {
@@ -26,5 +26,5 @@ export function useCostumers() {
     void reload();
   }, [reload]);
 
-  return { items, loading, error, reload };
+  return { costumers, loading, error, reload };
 }

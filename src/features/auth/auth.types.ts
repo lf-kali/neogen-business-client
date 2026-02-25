@@ -3,7 +3,10 @@ export type LoginRequest = {
   password: string;
 };
 
-// Ajuste conforme o retorno real do seu Nest (ex.: access_token)
 export type LoginResponse = {
-  access_token: string;
+  id: number;
+  name: string;
+  email: string;
+  profilePicture?: string | null;
+  token: string;
 };

@@ -1,7 +1,24 @@
+import type { FormEvent } from "react";
 import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
+import { useNavigate } from "react-router-dom";
+import { useLogin } from "../../features/auth/useLogin";
 
 function Login() {
+  const navigate = useNavigate();
+  const { login, loading } = useLogin();
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const fd = new FormData(e.currentTarget);
+    const email = String(fd.get("email") ?? "");
+    const password = String(fd.get("password") ?? "");
+
+    await login({ email, password });
+    navigate("/technician/dashboard");
+  }
+
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10"
@@ -54,7 +71,7 @@ function Login() {
               </p>
             </div>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={onSubmit}>
               <NeogenInput label="Email corporativo" type="email" id="email" name="email" placeholder="nome@empresa.com" />
               <NeogenInput label="Senha" type="password" id="password" name="password" placeholder="Digite sua senha" />
 
@@ -69,7 +86,7 @@ function Login() {
               </div>
 
               <NeogenButton type="submit" style={{ backgroundColor: "#0f172a" }}>
-                Entrar
+                {loading ? "Entrando..." : "Entrar"}
               </NeogenButton>
             </form>
 

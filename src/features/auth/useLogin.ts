@@ -14,7 +14,7 @@ export function useLogin() {
 
     try {
       const res = await authRepository.login(payload);
-      session.setToken(res.access_token);
+      session.setToken(res.token);
       return res;
     } catch (e) {
       const apiErr = toApiError(e);
