@@ -8,8 +8,8 @@ export const technicianRepository = {
     return data;
   },
 
-  async getById(id: number): Promise<Technician> {
-    const { data } = await http.get<Technician>(`${endpoints.technician}/${id}`);
+  async getByEmail(email: string): Promise<Technician> {
+    const { data } = await http.get<Technician>(`${endpoints.technician}/email/${email}`);
     return data;
   },
 
