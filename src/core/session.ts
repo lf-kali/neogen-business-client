@@ -1,3 +1,4 @@
+import type { ServiceOrder } from "../features/serviceOrder/serviceOrder.types";
 import { technicianRepository } from "../features/technician/technician.repository";
 
 const TOKEN_KEY = "neogen.token";
@@ -15,6 +16,7 @@ export interface UserSession {
   name: string;
   email: string;
   profilePicture?: string | null;
+  serviceOrders: ServiceOrder[],
   token: string;
 }
 
@@ -24,6 +26,7 @@ export const emptySession: UserSession = {
   name: '',
   email: '',
   profilePicture: '',
+  serviceOrders: [],
   token: '',
 }
 
@@ -79,32 +82,28 @@ export const session = {
   },
 
   async checkIn(): Promise <UserSession> {
-    const {email, token, expiration} = this.get()
+    const {email, token, expiration} = this.get();
 
-    const incompleteData = email === null || token === null || expiration === null
+    const incompleteData = email === null || token === null || expiration === null;
     if(incompleteData) return emptySession;
 
     const tokenExpirated = new Date(Date.now()) >= expiration;
     if (tokenExpirated) return emptySession;
 
-    let data;
-
     try {
       const res = await technicianRepository.getByEmail(email);
-      data = {
+      return {
         id: res.id,
         name: res.name,
         email: res.email,
         profilePicture: res.profilePicture,
-        token: `Bearer ${this.getToken}`
+        serviceOrders: res.serviceOrders,
+        token: `Bearer ${token}`
       }
     } catch (error: any) {
-      if(!error.toString().includes('401')){
-        console.error(error);
-      }
-      data = emptySession;
+      alert("Por favor, faça login novamente.")
+      if(!error.toString().includes('401')) console.error('ERRO:', error)
+      return emptySession;
     }
-
-    return data;
   },
 };
