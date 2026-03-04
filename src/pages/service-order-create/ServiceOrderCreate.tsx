@@ -1,6 +1,8 @@
+import { useLoaderData, useSearchParams } from "react-router-dom";
 import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenTextarea from "../../components/neogen/keyboard-input/neogen-textarea/NeogenTextarea";
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
+import type { UserSession } from "../../core/session";
 
 function ServiceOrderCreate() {
   const labelStyle = { color: "#1f2937" };
@@ -9,6 +11,10 @@ function ServiceOrderCreate() {
     borderColor: "rgba(255, 255, 255, 0.25)",
     color: "#0f172a",
   };
+
+  const user = useLoaderData() as UserSession;
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('from') || '/';
 
   return (
     <div

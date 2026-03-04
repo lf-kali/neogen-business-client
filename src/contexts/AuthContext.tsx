@@ -1,8 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { emptySession, session, type UserSession } from "../core/session";
 import type { LoginRequest } from "../features/auth/auth.types";
 import { useLogin } from "../features/auth/useLogin";
-import { useNavigate } from "react-router-dom";
 
 interface AuthContextProps {
     user: UserSession;
