@@ -37,7 +37,6 @@ export function AuthProvider({children}: AuthProviderProps) {
     const [sessionError, setSessionError] = useState<unknown | null>(null);
 
     const {login, loading: loginLoading} = useLogin();
-    const navigate = useNavigate();
 
     const ranOnceRef = useRef(false)
 
@@ -92,7 +91,6 @@ export function AuthProvider({children}: AuthProviderProps) {
         setUser(emptySession);
         setSessionStatus("anonymous");
         session.clear();
-        navigate('/login');
     }
 
     const authContextValue = useMemo(

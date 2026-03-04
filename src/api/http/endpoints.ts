@@ -7,5 +7,5 @@ export const endpoints = {
   deviceBrand: "/device-brand",
   deviceModel: "/device-model",
   serviceOrder: "/service-order",
-  technician: "/technician",
+  technician: "/technicians",
 } as const;
