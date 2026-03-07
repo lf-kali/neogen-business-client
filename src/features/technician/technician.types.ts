@@ -13,8 +13,10 @@ export type Technician = {
 export type CreateTechnician = {
   name: string;
   email: string;
+  password: string,
   phone?: string;
   address?: string;
+  profilePicture?: string;
 };
 
 export type UpdateTechnician = Partial<CreateTechnician>;

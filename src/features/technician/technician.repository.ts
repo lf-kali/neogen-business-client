@@ -1,6 +1,7 @@
 import { http } from "../../api/http/http";
 import { endpoints } from "../../api/http/endpoints";
 import type { CreateTechnician, Technician, UpdateTechnician } from "./technician.types";
+import { session } from "../../core/session";
 
 export const technicianRepository = {
   async list(): Promise<Technician[]> {
@@ -9,12 +10,14 @@ export const technicianRepository = {
   },
 
   async getByEmail(email: string): Promise<Technician> {
-    const { data } = await http.get<Technician>(`${endpoints.technician}/email/${email}`);
+    const { data } = await http.get<Technician>(`${endpoints.technician}/email/${email}`, {headers: {
+      Authorization: session.getToken(),
+    }});
     return data;
   },
 
   async create(payload: CreateTechnician): Promise<Technician> {
-    const { data } = await http.post<Technician>(endpoints.technician, payload);
+    const { data } = await http.post<Technician>(`${endpoints.technician}/create`, payload);
     return data;
   },
 

@@ -1,13 +1,122 @@
+import { useState, useRef, type FormEvent, type ChangeEvent, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenTextarea from "../../components/neogen/keyboard-input/neogen-textarea/NeogenTextarea";
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
+import type { CreateTechnician } from "../../features/technician/technician.types";
+import { technicianRepository } from "../../features/technician/technician.repository";
+import { cloudinaryService } from "../../services/cloudinary.service";
+import { AuthContext } from "../../contexts/AuthContext";
 
 function TechRegister() {
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const {handleLogin} = useContext(AuthContext)
+
   const darkLabelStyle = { color: "rgba(255, 255, 255, 0.72)" };
   const darkInputStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.92)",
     borderColor: "rgba(255, 255, 255, 0.3)",
     color: "#0f172a",
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFileName(file.name);
+      // Cria preview da imagem
+      const reader = new FileReader();
+      reader.onload = () => setPreviewUrl(reader.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setSelectedFileName(null);
+      setPreviewUrl(null);
+    }
+  };
+
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isLoading) return; // Previne duplo submit
+    
+    setError(null);
+    setIsLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+    const address = formData.get("address") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+    const profilePictureFile = fileInputRef.current?.files?.[0];
+
+    // Validações
+    if (!name || !email || !password) {
+      setError("Nome, email e senha são obrigatórios.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("A senha deve ter no mínimo 8 caracteres.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("As senhas não coincidem.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Upload da foto de perfil (se houver)
+      let profilePictureUrl = "";
+      if (profilePictureFile) {
+        profilePictureUrl = await cloudinaryService.uploadAvatar(profilePictureFile);
+        if (!profilePictureUrl) {
+          setError("Erro ao fazer upload da foto. Tente novamente.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Monta o objeto para envio
+      const technicianData: CreateTechnician = {
+        name,
+        email,
+        password,
+        ...(phone && { phone }),
+        ...(address && { address }),
+        ...(profilePictureUrl && { profilePicture: profilePictureUrl }),
+      };
+
+      // Envia a requisição de cadastro
+      await technicianRepository.create(technicianData);
+      
+      // Loga com os dados cadastrados
+      await handleLogin({email: technicianData.email, password: technicianData.password })
+      navigate("/technician/dashboard");
+
+    } catch (err: any) {
+      console.error("Erro ao cadastrar técnico:", err);
+      if (err.response?.status === 409) {
+        setError("Este email já está cadastrado.");
+      } else {
+        setError("Erro ao cadastrar técnico. Tente novamente.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -58,7 +167,13 @@ function TechRegister() {
               </p>
             </div>
 
-            <form className="space-y-5">
+            <form className="tech-register-form space-y-5" onSubmit={handleSubmit}>
+              {error && (
+                <div className="rounded-xl bg-red-500/20 border border-red-500/40 px-4 py-3 text-red-200 text-sm oxanium-400">
+                  {error}
+                </div>
+              )}
+
               <div className="grid gap-5 md:grid-cols-2">
                 <NeogenInput
                   label="Nome Completo"
@@ -121,18 +236,65 @@ function TechRegister() {
                 inputStyle={darkInputStyle}
               />
 
-              <NeogenInput
-                label="URL da Foto de Perfil (opcional)"
-                type="url"
-                id="profilePicture"
-                name="profilePicture"
-                placeholder="https://example.com/image.jpg"
-                labelStyle={darkLabelStyle}
-                inputStyle={darkInputStyle}
-              />
+              {/* File Input Estilizado */}
+              <div>
+                <label style={darkLabelStyle} className="block mb-2 text-sm oxanium-400">
+                  Foto de perfil
+                </label>
+                <div className="flex items-center gap-4">
+                  {/* Preview da imagem */}
+                  {previewUrl ? (
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-white/30 flex-shrink-0">
+                      <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl bg-white/10 border-2 border-dashed border-white/30 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                  )}
+                  
+                  {/* Botão customizado + input hidden */}
+                  <div className="flex-1">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      id="profilePicture"
+                      name="profilePicture"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleFileButtonClick}
+                      className="w-full px-4 py-3 rounded-xl text-sm oxanium-400 transition-all duration-200 hover:bg-white/95 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.92)",
+                        color: "#0f172a",
+                        border: "1px solid rgba(255, 255, 255, 0.3)",
+                      }}
+                    >
+                      {selectedFileName ? (
+                        <span className="truncate block">{selectedFileName}</span>
+                      ) : (
+                        <span className="text-slate-500">Clique para selecionar uma imagem...</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-              <NeogenButton type="submit" style={{ backgroundColor: "#111827" }}>
-                Cadastrar Técnico
+              <NeogenButton 
+                type="submit" 
+                style={{ 
+                  backgroundColor: "#111827",
+                  opacity: isLoading ? 0.6 : 1,
+                  cursor: isLoading ? "not-allowed" : "pointer"
+                }}
+              >
+                {isLoading ? "Cadastrando..." : "Cadastrar Técnico"}
               </NeogenButton>
             </form>
 

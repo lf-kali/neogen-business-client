@@ -6,6 +6,8 @@ import ServiceOrderCreate from "./pages/service-order-create/ServiceOrderCreate"
 import TechRegister from "./pages/tech-register/TechRegister";
 import { MainLayout } from "./layouts/MainLayout";
 import { authLoaderWithData } from "./utils/authLoaders";
+import CostumerList from "./components/customers/CostumerList";
+import CostumerDetails from "./components/customers/CostumerDetails";
 
 export const router = createBrowserRouter([
     {
@@ -39,6 +41,16 @@ export const router = createBrowserRouter([
                 element: <ServiceOrderCreate/>,
                 loader: authLoaderWithData,
             },
+            {
+                path: "/customers/list",
+                element: <CostumerList/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/customers/:id",
+                element: <CostumerDetails/>,
+                loader: authLoaderWithData,
+            }
         ],
     },
     {

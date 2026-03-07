@@ -2,7 +2,6 @@ import { useContext, type FormEvent } from "react";
 import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
 import { useNavigate } from "react-router-dom";
-import { useLogin } from "../../features/auth/useLogin";
 import { AuthContext } from "../../contexts/AuthContext";
 
 function Login() {

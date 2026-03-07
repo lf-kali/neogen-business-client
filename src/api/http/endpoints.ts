@@ -2,7 +2,7 @@ export const endpoints = {
   auth: {
     login: "/technicians/login",
   },
-  costumer: "/costumer",
+  costumer: "/costumers",
   device: "/device",
   deviceBrand: "/device-brand",
   deviceModel: "/device-model",

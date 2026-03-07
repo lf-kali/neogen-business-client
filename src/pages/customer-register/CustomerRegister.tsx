@@ -1,5 +1,9 @@
+import type { FormEvent } from "react";
 import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
+import type { CreateCostumer } from "../../features/costumer/costumer.types";
+import { costumerRepository } from "../../features/costumer/costumer.repository";
+import { useNavigate } from "react-router-dom";
 
 function CustomerRegister() {
   const darkLabelStyle = { color: "rgba(0, 0, 0, 0.75)" };
@@ -8,6 +12,40 @@ function CustomerRegister() {
     borderColor: "rgba(0, 0, 0, 0.28)",
     color: "#0f172a",
   };
+
+  const customerData: CreateCostumer = {
+    name: '',
+    email: undefined,
+    phone: undefined,
+    address: '',
+    cep: '',
+    cpf: '',
+    cnpj: undefined,
+  };
+
+  
+  const navigate = useNavigate();
+  
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const fd = new FormData(e.currentTarget);
+
+    for (let key of Object.keys(customerData) as (keyof CreateCostumer)[]) {
+      const value = String(fd.get(key));
+      customerData[key] = value;
+    }
+    
+
+    try {
+      await costumerRepository.create(customerData)
+      navigate('/customers/list')
+    }
+    catch (e) {
+      alert("Erro ao cadastrar cliente!")
+      console.error("Erro ao cadastrar cliente: ", e)
+    }
+  }
 
   return (
     <div
@@ -57,7 +95,7 @@ function CustomerRegister() {
               </p>
             </div>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={onSubmit}>
               <NeogenInput
                 label="Nome completo"
                 type="text"

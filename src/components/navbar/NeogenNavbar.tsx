@@ -49,14 +49,12 @@ function NeogenNavbar() {
               </span>
             </button>
 
-            <button
-              type="button"
-              className={`${linkBase} ${linkInactive} cursor-not-allowed opacity-80`}
-              title="Em breve"
-              aria-disabled="true"
+            <Link
+              to="/customers/list"
+              className={`${linkBase} ${isActive("/customers/list") ? linkActive : linkInactive}`}
             >
               Clientes
-            </button>
+            </Link>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
