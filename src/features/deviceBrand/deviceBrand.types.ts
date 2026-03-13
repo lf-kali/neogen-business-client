@@ -1,10 +1,15 @@
+import type { Device } from "../device/device.types";
+import type { DeviceModel } from "../deviceModel/deviceModel.types";
+
 export type DeviceBrand = {
   id: number;
-  // TODO: alinhar com src/device-brand/dto/* do server
+  name: string;
+  devices: Device[];
+  models: DeviceModel[]
 };
 
 export type CreateDeviceBrand = {
-  // TODO
+  name: string;
 };
 
 export type UpdateDeviceBrand = Partial<CreateDeviceBrand>;
