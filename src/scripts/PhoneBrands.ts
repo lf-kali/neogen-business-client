@@ -7,7 +7,6 @@ const html = `<ul class="dropdown-menu inner" role="menu" style="max-height: 219
 const DOM = new JSDOM(html)
 const doc = DOM.window.document
 
-
 const containerBrandNames = doc.querySelectorAll("span.text")
 
 let brandNames: string[] = []
@@ -18,7 +17,7 @@ for (let element of containerBrandNames) {
 }
 
 for (let brandName of brandNames) {
-    axios.post('http://localhost:3000/device-brands/new', {name: brandName}, {headers: {
-        Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290QHJvb3QuY29tIiwiaWF0IjoxNzczMjQwOTA1LCJleHAiOjE3NzMyNjk3MDV9.yOf_XVxhaJA9leL4KkffQlVnLHdBQOVoEWDI9gXxc_Y'
+    axios.post('https://neogen-erp-server.onrender.com/device-brands/new', {name: brandName}, {headers: {
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290QHJvb3QuY29tIiwiaWF0IjoxNzczMzYyNDc0LCJleHAiOjE3NzMzOTEyNzR9.mAeTXE0NH-OaohMCeamgL-I40irM4vUO-NxKAkCqEVg'
     }})
 }
