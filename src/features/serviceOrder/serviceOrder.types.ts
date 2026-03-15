@@ -1,6 +1,12 @@
+export type ServiceOrderStatus = 'confirmed' | 'acquiring_parts' | 'ongoing' | 'finished';
+
 export type ServiceOrder = {
   id: number;
-  // TODO: alinhar com src/service-order/dto/* do server
+  deadline: string;
+  status: ServiceOrderStatus;
+  entryDate: string;
+  techNotes: string;
+  closureDate: string | null;
 };
 
 export type CreateServiceOrder = {
