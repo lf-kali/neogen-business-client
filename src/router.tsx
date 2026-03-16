@@ -20,36 +20,31 @@ export const router = createBrowserRouter([
     },
     {
         element: <MainLayout/>,
+        loader: authLoaderWithData,
         children: [
             {
                 path: "/",
                 element: <TechDashboard/>,
-                loader: authLoaderWithData,
             },
             {
                 path: "/technician/dashboard",
                 element: <TechDashboard/>,
-                loader: authLoaderWithData,
             },
             {
                 path: "/customers/register",
                 element: <CustomerRegister/>,
-                loader: authLoaderWithData,
             },
             {
                 path: "/service-orders/create",
                 element: <ServiceOrderCreate/>,
-                loader: authLoaderWithData,
             },
             {
                 path: "/customers/list",
                 element: <CostumerList/>,
-                loader: authLoaderWithData,
             },
             {
                 path: "/customers/:id",
                 element: <CostumerDetails/>,
-                loader: authLoaderWithData,
             }
         ],
     },

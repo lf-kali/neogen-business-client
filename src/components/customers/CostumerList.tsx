@@ -1,7 +1,9 @@
 import CostumerCard from "./CostumerCard";
 import { useCostumers } from "../../features/costumer/useCostumers";
+import { useRequireAuth } from "../../utils/useRequireAuth";
 
 function CostumerList() {
+  const user = useRequireAuth();
   const { costumers, loading } = useCostumers();
 
   return (

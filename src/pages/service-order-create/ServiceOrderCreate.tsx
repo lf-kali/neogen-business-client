@@ -4,6 +4,7 @@ import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
 import type { UserSession } from "../../core/session";
 import DeviceForm from "../../components/devices/DeviceForm";
 import Popup from 'reactjs-popup'
+import { useRequireAuth } from "../../utils/useRequireAuth";
 
 function ServiceOrderCreate() {
   const labelStyle = { color: "#1f2937" };
@@ -13,7 +14,7 @@ function ServiceOrderCreate() {
     color: "#0f172a",
   };
 
-  const user = useLoaderData() as UserSession;
+  const user = useRequireAuth();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('from') || '/';
 

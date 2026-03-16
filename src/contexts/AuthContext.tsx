@@ -1,12 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { emptySession, session, type UserSession } from "../core/session";
 import type { LoginRequest } from "../features/auth/auth.types";
-import { useLogin } from "../features/auth/useLogin";
+import { authRepository } from "../features/auth/auth.repository";
 
 interface AuthContextProps {
     user: UserSession;
-    handleLogout(): void;
+    setUser: (user: UserSession) => void;
     handleLogin(payload: LoginRequest): Promise<void>;
+    handleLogout(): void;
     loading: boolean;
 }
 
@@ -32,34 +33,34 @@ interface AuthProviderProps {
 
 export function AuthProvider({children}: AuthProviderProps) {
     const [user, setUser] = useState<UserSession>(emptySession);
-    const [sessionStatus, setSessionStatus] = useState<SessionStatus>("checking");
+    const [status, setStatus] = useState<SessionStatus>("checking");
     const [sessionError, setSessionError] = useState<unknown | null>(null);
 
-    const {login, loading: loginLoading} = useLogin();
+    const [loading, setLoading] = useState(false);
 
     const ranOnceRef = useRef(false)
 
     const reloadSession = async () => {
-        setSessionStatus("checking");
+        setStatus("checking");
         setSessionError(null);
 
         try {
             const checkedUser = await session.checkIn();
-            if (checkedUser.id === 0 || !checkedUser.token) {
-                session.clear();
-                setUser(emptySession);
-                setSessionStatus("anonymous");
+            if (checkedUser.id !== 0 && checkedUser.token) {
+                setUser(checkedUser);
+                setStatus("authenticated");
             }
             else {
-                setUser(checkedUser);
-                setSessionStatus("authenticated");
+                session.clear();
+                setUser(emptySession);
+                setStatus("anonymous");
             }
         }
         catch (e) {
-            console.error("Erro ao verificar sessão no localStorage:", e)
+            console.error("Erro ao recarregar sessão:", e)
             session.clear();
             setUser(emptySession);
-            setSessionStatus("anonymous");
+            setStatus("anonymous");
             setSessionError(e);
         }
     };
@@ -71,41 +72,55 @@ export function AuthProvider({children}: AuthProviderProps) {
     }, []);
 
     async function handleLogin(payload: LoginRequest) {
+        setLoading(true);
+        setSessionError(null);
+
         try {
-            const res = await login(payload);
-            setUser(res);
-            setSessionStatus("authenticated");
-            // return res;
+            const res = await authRepository.login(payload);
+            session.store(res.email, res.token);
+            setUser({
+                id: res.id,
+                name: res.name,
+                email: res.email,
+                profilePicture: res.profilePicture,
+                serviceOrders: res.serviceOrders,
+                token: `Bearer ${res.token}`
+            });
+            setStatus("authenticated");
         } 
         catch (error) {
             alert("Erro ao fazer login!");
             console.error(error);
+            setSessionError("Credenciais inválidas");
             setUser(emptySession);
-            setSessionStatus("anonymous");
+            setStatus("anonymous");
             throw error;
+        }
+        finally {
+            setLoading(false);
         }
     }
 
     function handleLogout() {
-        setUser(emptySession);
-        setSessionStatus("anonymous");
         session.clear();
+        setUser(emptySession);
+        setStatus("anonymous");
     }
-
-    const authContextValue = useMemo(
-        () => ({user , handleLogin, handleLogout, loading: loginLoading}),
-        [user, handleLogin, handleLogout, loginLoading]
-    )
-
-    const sessionStatusContextValue = useMemo(
-        () => ({status: sessionStatus, reloadSession, sessionError}),
-        [sessionStatus, reloadSession, sessionError]
-    )
 
     return (
         <>
-            <AuthContext.Provider value={authContextValue}>
-                <SessionStatusContext.Provider value = {sessionStatusContextValue}>
+            <AuthContext.Provider value={{
+                user,
+                setUser,
+                handleLogin,
+                handleLogout,
+                loading,
+            }}>
+                <SessionStatusContext.Provider value = {{
+                    status,
+                    reloadSession,
+                    sessionError,
+                }}>
                     {children}
                 </SessionStatusContext.Provider>
             </AuthContext.Provider>

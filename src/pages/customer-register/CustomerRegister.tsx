@@ -4,8 +4,11 @@ import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
 import type { CreateCostumer } from "../../features/costumer/costumer.types";
 import { costumerRepository } from "../../features/costumer/costumer.repository";
 import { useNavigate } from "react-router-dom";
+import { useRequireAuth } from "../../utils/useRequireAuth";
 
 function CustomerRegister() {
+  const user = useRequireAuth();
+  
   const darkLabelStyle = { color: "rgba(0, 0, 0, 0.75)" };
   const darkInputStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.92)",

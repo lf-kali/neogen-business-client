@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Costumer } from "../../features/costumer/costumer.types";
 import { costumerRepository } from "../../features/costumer/costumer.repository";
+import { useRequireAuth } from "../../utils/useRequireAuth";
 
 function CostumerDetails() {
+  const user = useRequireAuth();
   const { id } = useParams<{ id: string }>();
   const [costumer, setCostumer] = useState<Costumer>({} as Costumer);
   const [loading, setLoading] = useState(false);

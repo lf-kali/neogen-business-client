@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
+import { useRequireAuth } from "../../utils/useRequireAuth";
 
 function TechDashboard() {
+  const user = useRequireAuth();
+  const serviceOrders = user.serviceOrders;
+
   const quickLinks = [
     {
       title: "Cadastrar cliente",

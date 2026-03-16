@@ -1,17 +1,10 @@
 
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 function UserNavBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user, handleLogout } = useAuth();
-  const navigate = useNavigate();
-
-  function logout() {
-    handleLogout();
-    navigate('/login')
-  }
 
   // Contagem de OS
   const osAbertas = user.serviceOrders?.filter(os => os.status !== "finished").length ?? 0;
@@ -86,7 +79,7 @@ function UserNavBar() {
                 </button>
                 <div className="my-1 border-t border-white/10" />
                 <button 
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
                 >
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
