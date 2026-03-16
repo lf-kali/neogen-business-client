@@ -1,23 +1,33 @@
-import type { ReactNode } from "react";
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 
-interface neogenButtonProps {
-    type?: "submit" | "reset" | "button" | undefined;
-    style?: React.CSSProperties | undefined
+type NeogenButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &{
     children?: ReactNode;
 }
 
-function NeogenButton({...props}: neogenButtonProps) {
-  return (
-    <>
-        <button
-            type={props.type}
-            className="w-full py-3 px-4 rounded-lg text-white transition-all duration-200 hover:opacity-90 active:scale-95 michroma-400"
-            style={props.style !== undefined ? props.style : { backgroundColor: '#007bff' } }
-        >
-            {props.children}
-        </button>    
-    </>
-  )
-}
+const NeogenButton = forwardRef<HTMLButtonElement, NeogenButtonProps>(
+    ({type, style, className, children, ...rest}, ref) => {
+        return (
+            <>
+                <button
+                    ref={ref}
+                    type={type}
+                    className={[
+                        "w-full py-3 px-4 rounded-lg text-white transition-all duration-200 hover:opacity-90 active:scale-95 michroma-400",
+                        className,
+                    ]
+                    .filter(Boolean)
+                    .join(" ")}
+                    style={style ?? { backgroundColor: '#007bff' } }
+                    {...rest}
+                >
+                    {children}
+                </button>    
+            </>
+        );
+    }
+
+);
+
+NeogenButton.displayName = "NeogenButton";
 
 export default NeogenButton
