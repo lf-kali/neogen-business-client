@@ -1,6 +1,5 @@
 import { useLoaderData, useSearchParams } from "react-router-dom";
 import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/NeogenInput";
-import NeogenTextarea from "../../components/neogen/keyboard-input/neogen-textarea/NeogenTextarea";
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
 import type { UserSession } from "../../core/session";
 import DeviceForm from "../../components/devices/DeviceForm";
