@@ -64,15 +64,6 @@ function ServiceOrderCreate() {
             </div>
 
             <div className="mt-6 grid gap-5">
-              <NeogenTextarea
-                label="Descrição do problema"
-                id="problemDescription"
-                name="problemDescription"
-                placeholder="Detalhe o problema relatado pelo cliente"
-                rows={4}
-                labelStyle={labelStyle}
-                inputStyle={inputStyle}
-              />
 
               <div className="grid gap-5 md:grid-cols-2">
                 <NeogenInput
