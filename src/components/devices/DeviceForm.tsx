@@ -1,3 +1,5 @@
+import type { FormEvent } from "react";
+import type { CreateDevice, InitialDiagnosis } from "../../features/device/device.types";
 import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenTextarea from "../neogen/keyboard-input/neogen-textarea/NeogenTextarea";
 import NeogenButton from "../neogen/neogen-button/NeogenButton";
@@ -10,6 +12,7 @@ function DeviceForm() {
     borderColor: "rgba(255, 255, 255, 0.25)",
     color: "#0f172a",
   };
+
   return (
     <div className="pb-6">
       <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
@@ -22,8 +25,8 @@ function DeviceForm() {
           <div className="mt-4 grid gap-5">
             <NeogenTextarea
               label="Descrição do problema"
-              id="deviceProblemDescription"
-              name="deviceProblemDescription"
+              id="problemDescription"
+              name="problemDescription"
               placeholder="Informe o problema específico do dispositivo"
               rows={3}
               labelStyle={labelStyle}
@@ -100,6 +103,7 @@ function DeviceForm() {
                 </span>
               </div>
 
+              {/* Checklist inicial */}
               <div className="mt-4 grid gap-5">
                 <div className="grid gap-5 md:grid-cols-3">
                   {[
@@ -301,6 +305,7 @@ function DeviceForm() {
             </div>
           </div>
 
+          {/* botão de envio */}
           <NeogenButton type="submit" style={{ backgroundColor: "#111827", width: "auto", paddingLeft: 24, paddingRight: 24 }}>Salvar</NeogenButton>
         </form>
       </div>
