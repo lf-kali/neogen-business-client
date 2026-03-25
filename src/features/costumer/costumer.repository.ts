@@ -26,11 +26,13 @@ export const costumerRepository = {
   },
 
   async update(id: number, payload: UpdateCostumer): Promise<Costumer> {
-    const { data } = await http.patch<Costumer>(`${endpoints.costumer}/${id}`, payload);
+    const { data } = await http.patch<Costumer>(`${endpoints.costumer}/update/${id}`, payload, {headers: {
+      Authorization: session.getToken(),
+    }});
     return data;
   },
 
   async remove(id: number): Promise<void> {
-    await http.delete(`${endpoints.costumer}/${id}`);
+    await http.delete(`${endpoints.costumer}/delete/${id}`);
   },
 };

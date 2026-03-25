@@ -5,12 +5,19 @@ import { session } from "../../core/session";
 
 export const technicianRepository = {
   async list(): Promise<Technician[]> {
-    const { data } = await http.get<Technician[]>(endpoints.technician);
+    const { data } = await http.get<Technician[]>(`${endpoints.technician}/all`);
     return data;
   },
 
   async getByEmail(email: string): Promise<Technician> {
     const { data } = await http.get<Technician>(`${endpoints.technician}/email/${email}`, {headers: {
+      Authorization: session.getToken(),
+    }});
+    return data;
+  },
+
+  async listByName(name: string): Promise<Technician[]> {
+    const { data } = await http.get<Technician[]>(`${endpoints.technician}/name/${name}`, {headers: {
       Authorization: session.getToken(),
     }});
     return data;
@@ -22,11 +29,9 @@ export const technicianRepository = {
   },
 
   async update(id: number, payload: UpdateTechnician): Promise<Technician> {
-    const { data } = await http.patch<Technician>(`${endpoints.technician}/${id}`, payload);
+    const { data } = await http.patch<Technician>(`${endpoints.technician}/update/${id}`, payload, {headers: {
+      Authorization: session.getToken(),
+    }});
     return data;
-  },
-
-  async remove(id: number): Promise<void> {
-    await http.delete(`${endpoints.technician}/${id}`);
   },
 };
