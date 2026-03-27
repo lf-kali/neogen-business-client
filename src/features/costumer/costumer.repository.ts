@@ -33,6 +33,8 @@ export const costumerRepository = {
   },
 
   async remove(id: number): Promise<void> {
-    await http.delete(`${endpoints.costumer}/delete/${id}`);
+    await http.delete(`${endpoints.costumer}/delete/${id}`, {headers: {
+      Authorization: session.getToken(),
+    }});
   },
 };

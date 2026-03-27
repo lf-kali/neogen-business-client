@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import type { Costumer } from "../../features/costumer/costumer.types";
 import { costumerRepository } from "../../features/costumer/costumer.repository";
+import DeleteCustomerDialog from "./DeleteCustomerDialog";
+import Popup from "reactjs-popup";
 
 function CostumerDetails() {
   const { id } = useParams<{ id: string }>();
   const [costumer, setCostumer] = useState<Costumer>({} as Costumer);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   async function getCostumerById(id: string) {
     setLoading(true);
@@ -65,16 +68,43 @@ function CostumerDetails() {
               <button
                 type="button"
                 className="rounded-full bg-white px-5 py-2 text-xs uppercase tracking-[0.22em] text-slate-900 oxanium-700 transition-all hover:bg-slate-100"
+                onClick={() => navigate(`/customers/edit/${id}`)}
               >
                 Editar
               </button>
 
-              <button
-                type="button"
-                className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-xs uppercase tracking-[0.22em] text-red-100 oxanium-400 transition-all hover:bg-red-500/20"
+              <Popup
+                trigger={
+                  <button
+                    type="button"
+                    className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-xs uppercase tracking-[0.22em] text-red-100 oxanium-400 transition-all hover:bg-red-500/20"
+                  >
+                    Deletar
+                  </button>
+                }
+                modal
+                closeOnDocumentClick
+                closeOnEscape
+                lockScroll
+                overlayStyle={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                contentStyle={{
+                  borderRadius: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto',
+                  maxWidth: '900px',
+                  width: 'min(500px, 60%)',
+                  background: 'none',
+                  border: 'none'
+                }}
               >
-                Deletar
-              </button>
+                <DeleteCustomerDialog id={costumer.id}/>
+              </Popup>
             </div>
           </div>
 

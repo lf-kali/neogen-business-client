@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Login from "./pages/login/Login";
 import TechDashboard from "./pages/tech-dashboard/TechDashboard";
-import CustomerRegister from "./pages/customer-register/CustomerRegister";
+import CustomerForm from "./components/customers/CustomerForm";
 import ServiceOrderCreate from "./pages/service-order-create/ServiceOrderCreate";
 import TechRegister from "./pages/tech-register/TechRegister";
 import { MainLayout } from "./layouts/MainLayout";
@@ -33,7 +33,12 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/customers/register",
-                element: <CustomerRegister/>,
+                element: <CustomerForm/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/customers/edit/:id",
+                element: <CustomerForm/>,
                 loader: authLoaderWithData,
             },
             {

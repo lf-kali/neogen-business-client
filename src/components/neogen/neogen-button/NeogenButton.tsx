@@ -1,6 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 
-type NeogenButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &{
+type NeogenButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
     children?: ReactNode;
 }
 
