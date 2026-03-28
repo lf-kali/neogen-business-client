@@ -68,7 +68,7 @@ function CostumerListItem({ costumer }: CostumerListItemProps) {
           <Popup
             trigger={
               <button
-                className="p-1.5 rounded hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors"
+                className="p-1.5 rounded hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors cursor-pointer"
                 aria-label={`Deletar cliente ${costumer.name}`}
               >
                 <svg

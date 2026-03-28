@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 function CostumerList() {
   const { costumers, loading } = useCostumers();
-  const navigate = useNavigate()
 
   return (
     <>
