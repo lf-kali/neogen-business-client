@@ -7,12 +7,12 @@ export type DeviceCategory = 'cellphone' | 'laptop' | 'pc' | 'tablet';
 export type Device = {
   id: number;
   problemDescription: string;
-  category: DeviceCategory;
+  category?: DeviceCategory;
   brand: DeviceBrand;
   model: DeviceModel;
   initialDiagnosis: InitialDiagnosis;
   handedAccessories: HandedAccessories;
-  serviceOrder: ServiceOrder;
+  serviceOrder?: ServiceOrder;
 };
 
 export type InitialDiagnosis = {
@@ -23,7 +23,7 @@ export type InitialDiagnosis = {
   battery?: 'ok' | 'damaged' |'swollen' | 'not_charging';
   rearCamera?: 'ok' | 'damaged' | 'not_working';
   frontalCamera?: 'ok' | 'damaged' | 'not_working';
-  touch: 'ok' | 'damaged' | 'phantom_touch' | 'not_working';
+  touch?: 'ok' | 'damaged' | 'phantom_touch' | 'not_working';
 }
 
 export type HandedAccessories = {

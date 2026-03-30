@@ -3,7 +3,7 @@ export const endpoints = {
     login: "/technicians/login",
   },
   costumer: "/costumers",
-  device: "/device",
+  device: "/devices",
   deviceBrand: "/device-brand",
   deviceModel: "/device-model",
   serviceOrder: "/service-order",

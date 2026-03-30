@@ -1,316 +1,395 @@
-import type { FormEvent } from "react";
-import type { CreateDevice, InitialDiagnosis } from "../../features/device/device.types";
+import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenTextarea from "../neogen/keyboard-input/neogen-textarea/NeogenTextarea";
 import NeogenButton from "../neogen/neogen-button/NeogenButton";
+import type { CreateDevice, DeviceCategory, HandedAccessories, InitialDiagnosis, UpdateDevice } from "../../features/device/device.types";
+import { deviceRepository } from "../../features/device/device.repository";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
+
+type DeviceFormData = {
+  problemDescription: string;
+  category?: DeviceCategory;
+  brandId: number;
+  modelId: number;
+}
 
 function DeviceForm() {
-  const labelStyle = { color: "#1f2937" };
-  const inputStyle = {
+  const {handleLogout} = useAuth();
+  const navigate = useNavigate();
+  const {id} = useParams<{id:string}>();
+  
+  const [deviceFormData, setDeviceFormData ] = useState<DeviceFormData>({
+    problemDescription: '',
+    category: undefined,
+    brandId: 0,
+    modelId: 0,
+  });
+
+  const [initialDiagnosisFormdata, setInitialDiagnosisFormdata] = useState<InitialDiagnosis>({
+    externalState: '',
+    turnsOn: false,
+    audio: '',
+    screen: undefined,
+    battery: undefined,
+    rearCamera: undefined,
+    frontalCamera: undefined,
+  });
+
+  const [handedAccessoriesFormdata, setHandedAccessoriesFormdata] = useState<HandedAccessories>({
+    charger: false,
+    cable: false,
+    case: false,
+    storageDevice: undefined,
+  });
+
+
+  async function getDevice(id: number) {
+    try {
+      const device = await deviceRepository.getById(id);
+      setDeviceFormData({problemDescription: device.problemDescription, category: device.category, brandId: device.brand.id, modelId: device.model.id});
+      setInitialDiagnosisFormdata(device.initialDiagnosis);
+      setHandedAccessoriesFormdata(device.handedAccessories);
+      
+    } catch (error: any) {
+      if(error.toString().includes('401')) handleLogout()
+    }
+    
+  }
+  useEffect(()=>{
+    if (id) {
+      getDevice(+id)
+    }
+  },[id])
+
+  function onInputChange<T>(data: T, setData: Dispatch<SetStateAction<T>>, e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+    setData({
+      ...data,
+      [e.target.name]: e.target.value,
+    })
+  }
+  
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const payload: CreateDevice | UpdateDevice= {
+      ...deviceFormData,
+      brandId: +deviceFormData.brandId,
+      modelId: +deviceFormData.modelId,
+      initialDiagnosis: initialDiagnosisFormdata,
+      handedAccessories: handedAccessoriesFormdata
+    } 
+
+    console.log(payload)
+
+    try {
+      if (!id) await deviceRepository.create(payload as CreateDevice)
+      else await deviceRepository.update(+id, payload as UpdateDevice)
+      navigate('/devices')
+    }
+    catch (e) {
+      alert("Erro ao salvar dispositivo!")
+      console.error("Erro ao salvar dispositivo: ", e)
+    }
+  }
+
+  
+  const darkLabelStyle = { color: "rgba(0, 0, 0, 0.75)" };
+  const darkInputStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.92)",
-    borderColor: "rgba(255, 255, 255, 0.25)",
+    borderColor: "rgba(0, 0, 0, 0.28)",
     color: "#0f172a",
   };
 
   return (
-    <div className="pb-6">
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
-        <h4 className="text-2xl michroma-700 text-slate-900 pb-0.5">Cadastro de dispositivo</h4>
-        <p className="mt-1 text-sm text-slate-500 oxanium-400 pb-1">
-          Preencha os dados do dispositivo para adicionar à lista.
-        </p>
+    <div
+      className="flex flex-col items-center px-4 md:py-6 sm:py-10"
+      style={{ background: "linear-gradient(135deg, #f5f8ff 0%, #edf2ff 45%, #f8fafc 100%)" }}
+    >
+      <div className="w-full max-w-2xl lg:max-w-6xl rounded-[32px] bg-white/75 shadow-2xl backdrop-blur border border-white/60 overflow-hidden">
+        <div className="p-3 sm:p-8 lg:p-12">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{id ? 'Editar dados de Dispositivo' : 'Novo Dispositivo'}</h2>
+              <p className="mt-2 text-xs sm:text-sm text-slate-500 oxanium-400">
+                Preencha as informações do dispositivo.
+              </p>
+            </div>
 
-        <form>
-          <div className="mt-4 grid gap-5">
-            <NeogenTextarea
-              label="Descrição do problema"
-              id="problemDescription"
-              name="problemDescription"
-              placeholder="Informe o problema específico do dispositivo"
-              rows={3}
-              labelStyle={labelStyle}
-              inputStyle={inputStyle}
-            />
+            <form className="space-y-4 sm:space-y-5" onSubmit={onSubmit}>
+              {/* Descrição do Problema */}
+              <NeogenTextarea
+                label="Descrição do Problema"
+                id="problemDescription"
+                name="problemDescription"
+                placeholder="Descreva o problema do dispositivo"
+                rows={4}
+                labelStyle={darkLabelStyle}
+                inputStyle={darkInputStyle}
+                value={deviceFormData.problemDescription}
+                onChange={(e) => onInputChange<DeviceFormData>(deviceFormData, setDeviceFormData, e)}
+              />
 
-            <div className="grid gap-5 md:grid-cols-3">
+              {/* Categoria */}
               <div>
-                <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
-                  Categoria
+                <label
+                  htmlFor="category"
+                  className="block text-sm mb-2 oxanium-700"
+                  style={darkLabelStyle}
+                >
+                  Categoria do Dispositivo
                 </label>
                 <select
                   id="category"
                   name="category"
+                  value={deviceFormData.category || ''}
+                  onChange={(e) => onInputChange<DeviceFormData>(deviceFormData, setDeviceFormData, e)}
                   className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                  style={inputStyle}
-                  defaultValue=""
+                  style={darkInputStyle}
                 >
-                  <option value="" disabled>
-                    Selecione
-                  </option>
+                  <option value="">Selecione uma categoria</option>
                   <option value="cellphone">Celular</option>
-                  <option value="laptop">Laptop</option>
+                  <option value="laptop">Notebook</option>
                   <option value="pc">PC</option>
                   <option value="tablet">Tablet</option>
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
-                  Marca
-                </label>
-                <select
+              {/* Brand ID e Model ID */}
+              <div className="grid grid-cols-2 gap-4">
+                <NeogenInput
+                  label="ID da Marca"
                   id="brandId"
+                  type="number"
                   name="brandId"
-                  className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                  style={inputStyle}
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Selecione
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
-                  Modelo
-                </label>
-                <select
+                  value={deviceFormData.brandId}
+                  onChange={(e) => onInputChange<DeviceFormData>(deviceFormData, setDeviceFormData, e)}
+                  labelStyle={darkLabelStyle}
+                  inputStyle={darkInputStyle}
+                />
+                <NeogenInput
+                  label="ID do Modelo"
                   id="modelId"
+                  type="number"
                   name="modelId"
-                  className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                  style={inputStyle}
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Selecione
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div className="mt-2 rounded-2xl border border-white/10 bg-white/60 p-4">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <h5 className="text-sm michroma-700 text-slate-900">Diagnóstico inicial</h5>
-                  <p className="mt-1 text-xs text-slate-500 oxanium-400">
-                    Registre o estado do dispositivo no recebimento.
-                  </p>
-                </div>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] text-slate-500 oxanium-400">
-                  checklist
-                </span>
+                  value={deviceFormData.modelId}
+                  onChange={(e) => onInputChange<DeviceFormData>(deviceFormData, setDeviceFormData, e)}
+                  labelStyle={darkLabelStyle}
+                  inputStyle={darkInputStyle}
+                />
               </div>
 
-              {/* Checklist inicial */}
-              <div className="mt-4 grid gap-5">
-                <div className="grid gap-5 md:grid-cols-3">
-                  {[
-                    { id: "charger", label: "Carregador" },
-                    { id: "cable", label: "Cabo" },
-                    { id: "case", label: "Capa" },
-                  ].map((item) => (
-                    <fieldset key={item.id} className="space-y-2">
-                      <legend className="text-sm oxanium-700" style={{ color: labelStyle.color }}>
-                        {item.label}
-                      </legend>
-                      <div className="flex items-center gap-4 text-xs oxanium-400 text-slate-600">
-                        <label className="flex items-center gap-2" htmlFor={`handedAccessories.${item.id}.yes`}>
-                          <input
-                            id={`handedAccessories.${item.id}.yes`}
-                            type="radio"
-                            name={`handedAccessories.${item.id}`}
-                            value="true"
-                          />
-                          Sim
-                        </label>
-                        <label className="flex items-center gap-2" htmlFor={`handedAccessories.${item.id}.no`}>
-                          <input
-                            id={`handedAccessories.${item.id}.no`}
-                            type="radio"
-                            name={`handedAccessories.${item.id}`}
-                            value="false"
-                          />
-                          Não
-                        </label>
-                      </div>
-                    </fieldset>
-                  ))}
-                </div>
-
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
-                      Armazenamento entregue
-                    </label>
-                    <select
-                      id="storageDevice"
-                      name="storageDevice"
-                      className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                      style={inputStyle}
-                      defaultValue=""
-                    >
-                      <option value="" disabled>
-                        Selecione
-                      </option>
-                      <option value="sd_card">Cartão SD</option>
-                      <option value="flash_drive">Pendrive</option>
-                      <option value="external_hdd">HD externo</option>
-                      <option value="external_ssd">SSD externo</option>
-                    </select>
-                  </div>
-                  <NeogenInput
-                    label="Estado externo"
-                    type="text"
+              {/* Diagnóstico Inicial */}
+              <fieldset className="border rounded-lg p-4" style={{ borderColor: 'rgba(0, 0, 0, 0.28)' }}>
+                <legend className="text-sm oxanium-700" style={darkLabelStyle}>
+                  Diagnóstico Inicial
+                </legend>
+                <div className="space-y-4 mt-4">
+                  <NeogenTextarea
+                    label="Estado Externo"
                     id="externalState"
                     name="externalState"
-                    placeholder="Ex.: riscos, amassados"
-                    labelStyle={labelStyle}
-                    inputStyle={inputStyle}
+                    placeholder="Descreva o estado externo do dispositivo"
+                    rows={2}
+                    labelStyle={darkLabelStyle}
+                    inputStyle={darkInputStyle}
+                    value={initialDiagnosisFormdata.externalState}
+                    onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
                   />
-                </div>
 
-                <fieldset className="space-y-2">
-                  <legend className="text-sm oxanium-700" style={{ color: labelStyle.color }}>
-                    Liga?
-                  </legend>
-                  <div className="flex items-center gap-4 text-xs oxanium-400 text-slate-600">
-                    <label className="flex items-center gap-2" htmlFor="turnsOnYes">
-                      <input id="turnsOnYes" type="radio" name="turnsOn" value="true" />
-                      Sim
-                    </label>
-                    <label className="flex items-center gap-2" htmlFor="turnsOnNo">
-                      <input id="turnsOnNo" type="radio" name="turnsOn" value="false" />
-                      Não
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="turnsOn"
+                      name="turnsOn"
+                      checked = {initialDiagnosisFormdata.turnsOn}
+                      onChange={(e) => setInitialDiagnosisFormdata({...initialDiagnosisFormdata, turnsOn: e.currentTarget.checked})}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="turnsOn" className="ml-2 text-sm oxanium-400 font-bold" style={darkLabelStyle}>
+                      Liga Normalmente
                     </label>
                   </div>
-                </fieldset>
 
-                <NeogenInput
-                  label="Áudio"
-                  type="text"
-                  id="audio"
-                  name="audio"
-                  placeholder="Ex.: ok, ruído, sem som"
-                  labelStyle={labelStyle}
-                  inputStyle={inputStyle}
-                />
+                  <NeogenInput
+                    label="Áudio"
+                    id="audio"
+                    type="text"
+                    name="audio"
+                    placeholder="Descrição do áudio"
+                    labelStyle={darkLabelStyle}
+                    inputStyle={darkInputStyle}
+                    value={initialDiagnosisFormdata.audio}
+                    onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
+                  />
 
-                <div className="grid gap-5 md:grid-cols-2">
                   <div>
-                    <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
+                    <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
                       Tela
                     </label>
                     <select
-                      id="screen"
                       name="screen"
                       className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                      style={inputStyle}
-                      defaultValue=""
+                      style={darkInputStyle}
+                      value={initialDiagnosisFormdata.screen}
+                      onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
                     >
-                      <option value="" disabled>
-                        Selecione
-                      </option>
-                      <option value="ok">Ok</option>
-                      <option value="cracked">Trincada</option>
-                      <option value="leaking">Vazando</option>
-                      <option value="no_video">Sem vídeo</option>
+                      <option value="">Selecione o estado da tela</option>
+                      <option value="ok">OK</option>
+                      <option value="damaged">Danificada</option>
+                      <option value="no_video">Sem Vídeo</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
+                    <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
                       Bateria
                     </label>
                     <select
-                      id="battery"
                       name="battery"
                       className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                      style={inputStyle}
-                      defaultValue=""
+                      style={darkInputStyle}
+                      value={initialDiagnosisFormdata.battery}
+                      onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
                     >
-                      <option value="" disabled>
-                        Selecione
-                      </option>
-                      <option value="ok">Ok</option>
-                      <option value="swollen">Estufada</option>
-                      <option value="not_charging">Não carrega</option>
+                      <option value="">Selecione o estado da bateria</option>
+                      <option value="ok">OK</option>
+                      <option value="damaged">Danificada</option>
+                      <option value="swollen">Inchada</option>
+                      <option value="not_charging">Não Carrega</option>
                     </select>
                   </div>
-                </div>
 
-                <div className="grid gap-5 md:grid-cols-3">
                   <div>
-                    <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
-                      Câmera traseira
+                    <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
+                      Câmera Traseira
                     </label>
                     <select
-                      id="rearCamera"
                       name="rearCamera"
                       className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                      style={inputStyle}
-                      defaultValue=""
+                      style={darkInputStyle}
+                      value={initialDiagnosisFormdata.rearCamera}
+                      onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
                     >
-                      <option value="" disabled>
-                        Selecione
-                      </option>
-                      <option value="ok">Ok</option>
+                      <option value="">Selecione o estado</option>
+                      <option value="ok">OK</option>
                       <option value="damaged">Danificada</option>
-                      <option value="not_working">Não funciona</option>
+                      <option value="not_working">Não Funciona</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
-                      Câmera frontal
+                    <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
+                      Câmera Frontal
                     </label>
                     <select
-                      id="frontalCamera"
                       name="frontalCamera"
                       className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                      style={inputStyle}
-                      defaultValue=""
+                      style={darkInputStyle}
+                      value={initialDiagnosisFormdata.frontalCamera}
+                      onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
                     >
-                      <option value="" disabled>
-                        Selecione
-                      </option>
-                      <option value="ok">Ok</option>
+                      <option value="">Selecione o estado</option>
+                      <option value="ok">OK</option>
                       <option value="damaged">Danificada</option>
-                      <option value="not_working">Não funciona</option>
+                      <option value="not_working">Não Funciona</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm mb-2 oxanium-700" style={{ color: labelStyle.color }}>
+                    <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
                       Toque
                     </label>
                     <select
-                      id="touch"
                       name="touch"
                       className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
-                      style={inputStyle}
-                      defaultValue=""
+                      style={darkInputStyle}
+                      value={initialDiagnosisFormdata.touch}
+                      onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
                     >
-                      <option value="" disabled>
-                        Selecione
-                      </option>
-                      <option value="ok">Ok</option>
-                      <option value="phantom_touch">Toque fantasma</option>
-                      <option value="not_working">Não funciona</option>
+                      <option value="">Selecione o estado</option>
+                      <option value="ok">OK</option>
+                      <option value="damaged">Danificado</option>
+                      <option value="phantom_touch">Phantom Touch</option>
+                      <option value="not_working">Não Funciona</option>
                     </select>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              </fieldset>
 
-          {/* botão de envio */}
-          <NeogenButton type="submit" style={{ backgroundColor: "#111827", width: "auto", paddingLeft: 24, paddingRight: 24 }}>Salvar</NeogenButton>
-        </form>
+              {/* Acessórios Entregues */}
+              <fieldset className="border rounded-lg p-4" style={{ borderColor: 'rgba(0, 0, 0, 0.28)' }}>
+                <legend className="text-sm oxanium-700" style={darkLabelStyle}>
+                  Acessórios Entregues
+                </legend>
+                <div className="space-y-3 mt-4">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="charger"
+                      name="charger"
+                      checked={handedAccessoriesFormdata.charger}
+                      onChange={(e) => setHandedAccessoriesFormdata({...handedAccessoriesFormdata, charger: e.currentTarget.checked})}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="charger" className="ml-2 text-sm oxanium-400" style={darkLabelStyle}>
+                      Carregador
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="cable"
+                      name="cable"
+                      checked={handedAccessoriesFormdata.cable}
+                      onChange={(e) => setHandedAccessoriesFormdata({...handedAccessoriesFormdata, cable: e.currentTarget.checked})}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="cable" className="ml-2 text-sm oxanium-400" style={darkLabelStyle}>
+                      Cabo
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="case"
+                      name="case"
+                      checked={handedAccessoriesFormdata.case}
+                      onChange={(e) => setHandedAccessoriesFormdata({...handedAccessoriesFormdata, case: e.currentTarget.checked})}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="case" className="ml-2 text-sm oxanium-400" style={darkLabelStyle}>
+                      Capinha
+                    </label>
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
+                      Dispositivo de Armazenamento
+                    </label>
+                    <select
+                      name="storageDevice"
+                      className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
+                      style={darkInputStyle}
+                      value={handedAccessoriesFormdata.storageDevice}
+                      onChange={(e) => onInputChange<HandedAccessories>(handedAccessoriesFormdata, setHandedAccessoriesFormdata, e)}
+                    >
+                      <option value="">Nenhum</option>
+                      <option value="sd_card">Cartão SD</option>
+                      <option value="flash_drive">Pen Drive</option>
+                      <option value="external_hdd">HD Externo</option>
+                      <option value="external_ssd">SSD Externo</option>
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
+
+              <NeogenButton type="submit" style={{ backgroundColor: "#0f172a" }}>
+                Salvar Dispositivo
+              </NeogenButton>
+            </form>
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default DeviceForm
+export default DeviceForm;

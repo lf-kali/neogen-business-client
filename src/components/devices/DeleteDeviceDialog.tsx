@@ -1,24 +1,24 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { costumerRepository } from "../../features/costumer/costumer.repository";
+import { deviceRepository } from "../../features/device/device.repository";
 
-type deleteCustomerDialogProps = {
+type deleteDeviceDialogProps = {
     id: number
 }
 
-function DeleteCustomerDialog({id}: deleteCustomerDialogProps) {
+function DeleteDeviceDialog({id}: deleteDeviceDialogProps) {
   const navigate = useNavigate()
   const location = useLocation();
 
-  async function deleteCustomer() {
+  async function deleteDevice() {
     try {
-        await costumerRepository.remove(id)
+        await deviceRepository.remove(id)
     } catch (error) {
-        alert(`Erro ao deletar cliente!`)
-        console.error(`Erro ao deletar cliente: ${error}`)
+        alert(`Erro ao deletar dispositivo!`)
+        console.error(`Erro ao deletar dispositivo: ${error}`)
     }
 
-    if (location.pathname === '/customers') navigate(0);
-    else navigate('/customers')
+    if (location.pathname === '/devices') navigate(0);
+    else navigate('/devices')
   }
 
   return (
@@ -50,7 +50,7 @@ function DeleteCustomerDialog({id}: deleteCustomerDialogProps) {
       {/* Body */}
       <div className="px-6 py-6">
         <p className="text-sm text-slate-700 leading-relaxed mb-4">
-          Você tem certeza que deseja deletar este cliente? Esta ação é
+          Você tem certeza que deseja deletar este dispositivo? Esta ação é
           <span className="font-semibold text-red-600"> irreversível</span> e não poderá ser desfeita.
         </p>
         
@@ -71,13 +71,13 @@ function DeleteCustomerDialog({id}: deleteCustomerDialogProps) {
         </button>
         <button
           className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-700 hover:bg-red-800 active:scale-95 transition-all duration-200 oxanium-600 shadow-md hover:shadow-lg"
-          onClick={deleteCustomer}
+          onClick={deleteDevice}
         >
-          Deletar Cliente
+          Deletar Dispositivo
         </button>
       </div>
     </div>
   );
 }
 
-export default DeleteCustomerDialog
+export default DeleteDeviceDialog

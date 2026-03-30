@@ -20,6 +20,7 @@ const NeogenInput = forwardRef<HTMLInputElement, neogenInputProps>(
               {label}
             </label>
             <input
+              ref={ref}
               value={value}
               type={type}
               id={id}

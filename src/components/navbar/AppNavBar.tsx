@@ -40,8 +40,8 @@ function AppNavBar() {
             </button>
 
             <Link
-              to="/customers/list"
-              className={`${linkBase} ${isActive("/customers/list") ? linkActive : linkInactive}`}
+              to="/customers"
+              className={`${linkBase} ${isActive("/customers") ? linkActive : linkInactive}`}
             >
               Clientes
             </Link>

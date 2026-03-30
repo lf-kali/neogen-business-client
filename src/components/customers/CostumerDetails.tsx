@@ -54,14 +54,11 @@ function CostumerDetails() {
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-65">
               <span className="inline-flex items-center rounded-full border border-white/20 px-4 py-1 text-xs uppercase tracking-[0.3em] oxanium-400">
-                Customer Profile
+                Cliente
               </span>
-              <h1 className="mt-5 text-3xl lg:text-4xl michroma-700">
+              <h1 className="mt-5 text-3xl xl:text-3xl michroma-700">
                 {headerTitle}
               </h1>
-              <p className="mt-3 text-sm leading-relaxed text-white/70 oxanium-400">
-                Painel com informações essenciais do cliente para suporte, atendimento e tomada de decisão.
-              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -109,7 +106,7 @@ function CostumerDetails() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            {["Futurista", "Empresarial", "Centralizado"].map((tag) => (
+            {[`Email: ${costumer.email}`, `Telefone: ${costumer.phone}`, `Ordens de serviço abertas: ${costumer.serviceOrders?.length ?? 0}`,].map((tag) => (
               <span key={tag} className="rounded-full bg-white/10 px-4 py-1 text-xs oxanium-400 text-white/70">
                 {tag}
               </span>
