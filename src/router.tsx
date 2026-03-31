@@ -11,6 +11,12 @@ import CostumerDetails from "./components/customers/CostumerDetails";
 import DeviceForm from "./components/devices/DeviceForm";
 import DeviceList from "./components/devices/DeviceList";
 import DeviceDetails from "./components/devices/DeviceDetails";
+import ProductCategoryList from "./components/product-category/ProductCategoryList";
+import ProductCategoryDetails from "./components/product-category/ProductCategoryDetails";
+import ProductCategoryForm from "./components/product-category/ProductCategoryForm";
+import ProductList from "./components/product/ProductList";
+import ProductDetails from "./components/product/ProductDetails";
+import ProductForm from "./components/product/ProductForm";
 
 export const router = createBrowserRouter([
     {
@@ -76,6 +82,49 @@ export const router = createBrowserRouter([
             {
                 path: "/devices/edit/:id",
                 element: <DeviceForm/>,
+                loader: authLoaderWithData,
+            },
+            
+            // CATEGORIAS DE PRODUTO
+            {
+                path: "/product-categories",
+                element: <ProductCategoryList/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/product-categories/:id",
+                element: <ProductCategoryDetails/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/product-categories/new",
+                element: <ProductCategoryForm/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/product-categories/edit/:id",
+                element: <ProductCategoryForm/>,
+                loader: authLoaderWithData,
+            },
+            // PRODUTOs
+            {
+                path: "/products",
+                element: <ProductList/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/products/:id",
+                element: <ProductDetails/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/products/new",
+                element: <ProductForm/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/products/edit/:id",
+                element: <ProductForm/>,
                 loader: authLoaderWithData,
             },
             // ORDENS DE SERVIÇO

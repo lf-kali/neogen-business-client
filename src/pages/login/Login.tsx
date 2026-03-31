@@ -1,12 +1,14 @@
-import { useContext, type FormEvent } from "react";
+import { useContext, useState, type FormEvent } from "react";
 import NeogenInput from "../../components/neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../../components/neogen/neogen-button/NeogenButton";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
+import { toApiError, type ApiError } from "../../api/http/apiError";
 
 function Login() {
   const navigate = useNavigate();
   const {handleLogin, loading} = useContext(AuthContext)
+  const [error, setError] = useState<ApiError | null>(null);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -15,8 +17,14 @@ function Login() {
     const email = String(fd.get("email") ?? "");
     const password = String(fd.get("password") ?? "");
 
-    await handleLogin({ email, password });
-    navigate("/technician/dashboard");
+    try {
+      await handleLogin({ email, password });
+      navigate("/technician/dashboard");
+    }
+    catch(error: any) {
+      setError(toApiError(error))
+    }
+    
   }
 
   return (

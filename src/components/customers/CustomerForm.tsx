@@ -49,16 +49,15 @@ function CustomerForm() {
     console.log(customerFormData)
 
     try {
-      if (!id) await costumerRepository.create(customerFormData as CreateCostumer)
-      else await costumerRepository.update(+id, customerFormData as UpdateCostumer)
-      navigate('/customers/list')
+      if (!id) await costumerRepository.create(customerFormData as CreateCostumer);
+      else await costumerRepository.update(+id, customerFormData as UpdateCostumer);
+      navigate('/customers');
     }
     catch (e) {
       alert("Erro ao salvar cliente!")
       console.error("Erro ao salvar cliente: ", e)
     }
   }
-
   
   const darkLabelStyle = { color: "rgba(0, 0, 0, 0.75)" };
   const darkInputStyle = {

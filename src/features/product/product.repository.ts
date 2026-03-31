@@ -26,8 +26,8 @@ export const productRepository = {
         return data;
     },
 
-    async update(payload: UpdateProduct): Promise<Product> {
-        const { data } = await http.patch<Product>(`${endpoints.product}/update`, payload, {headers: {
+    async update(id: number, payload: UpdateProduct): Promise<Product> {
+        const { data } = await http.patch<Product>(`${endpoints.product}/update/${id}`, payload, {headers: {
             Authorization: session.getToken(),
         }});
         return data;
