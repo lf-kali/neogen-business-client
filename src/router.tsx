@@ -17,6 +17,8 @@ import ProductCategoryForm from "./components/product-category/ProductCategoryFo
 import ProductList from "./components/product/ProductList";
 import ProductDetails from "./components/product/ProductDetails";
 import ProductForm from "./components/product/ProductForm";
+import ServiceTypeList from "./components/serviceTypes/ServiceTypeList";
+import ServiceTypeDetails from "./components/serviceTypes/ServiceTypeDetails";
 
 export const router = createBrowserRouter([
     {
@@ -124,6 +126,27 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/products/edit/:id",
+                element: <ProductForm/>,
+                loader: authLoaderWithData,
+            },
+            // SERVIÇOS
+            {
+                path: "/service-types",
+                element: <ServiceTypeList/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/service-types/:id",
+                element: <ServiceTypeDetails/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/service-types/new",
+                element: <ProductForm/>,
+                loader: authLoaderWithData,
+            },
+            {
+                path: "/service-types/edit/:id",
                 element: <ProductForm/>,
                 loader: authLoaderWithData,
             },
