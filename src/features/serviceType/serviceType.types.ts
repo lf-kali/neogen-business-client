@@ -5,7 +5,7 @@ export type ServiceType = {
     name: string;
     costPrice?: number;
     salePrice: number;
-    comssionPercent?: number;
+    comissionPercent?: number;
     desc?: string;
     serviceOrders: ServiceOrder[];
 }
@@ -13,6 +13,7 @@ export type ServiceType = {
 export type CreateServiceType = {
     name: string;
     costPrice?: number;
+    salePrice: number;
     comissionPercent?: number;
     desc?: string;
 }

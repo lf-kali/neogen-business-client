@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
 import { useServiceTypes } from "../../features/serviceType/useServiceTypes"
 import ServiceTypeListItem from "./ServiceTypeListItem";
+import { useEffect } from "react";
 
 function ServiceTypeList() {
   const {serviceTypes, loading} = useServiceTypes();
+  useEffect(() => {
+    console.log(serviceTypes);
+  },[serviceTypes]);
     
   return (
     <>

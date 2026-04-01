@@ -19,6 +19,7 @@ import ProductDetails from "./components/product/ProductDetails";
 import ProductForm from "./components/product/ProductForm";
 import ServiceTypeList from "./components/serviceTypes/ServiceTypeList";
 import ServiceTypeDetails from "./components/serviceTypes/ServiceTypeDetails";
+import ServiceTypeForm from "./components/serviceTypes/ServiceTypeForm";
 
 export const router = createBrowserRouter([
     {
@@ -142,12 +143,12 @@ export const router = createBrowserRouter([
             },
             {
                 path: "/service-types/new",
-                element: <ProductForm/>,
+                element: <ServiceTypeForm/>,
                 loader: authLoaderWithData,
             },
             {
                 path: "/service-types/edit/:id",
-                element: <ProductForm/>,
+                element: <ServiceTypeForm/>,
                 loader: authLoaderWithData,
             },
             // ORDENS DE SERVIÇO

@@ -10,7 +10,8 @@ function DeleteServiceTypeDialog({id}: deleteServiceTypeDialogProps) {
   async function deleteServiceType() {
     try {
       await serviceTypeRepository.delete(id)
-      navigate('/service-types')
+      if (location.pathname === '/service-types') navigate(0);
+      else navigate('/service-types');
     }
     catch (error) {
       alert(`Erro ao deletar serviço!`)

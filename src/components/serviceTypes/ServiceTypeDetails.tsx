@@ -43,7 +43,7 @@ function ServiceTypeDetails() {
   const displayName = serviceType?.name?.trim() ? serviceType.name : "—";
   const displayCostPrice = serviceType?.costPrice ? `R$ ${serviceType.costPrice.toFixed(2)}` : "—";
   const displaySalePrice = serviceType?.salePrice ? `R$ ${serviceType.salePrice.toFixed(2)}` : "—";
-  const displayCommissionPercent = serviceType?.comssionPercent !== undefined ? `${serviceType.comssionPercent}%` : "—";
+  const displayCommissionPercent = serviceType?.comissionPercent !== undefined ? `${serviceType.comissionPercent}%` : "—";
   const displayDescription = serviceType?.desc?.trim() ? serviceType.desc : "—";
   const displayId = serviceType?.id ? String(serviceType.id) : "—";
 

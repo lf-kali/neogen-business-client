@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, type To } from "react-router-dom";
 import { productRepository } from "../../features/product/product.repository";
 
 type deleteProductDialogProps = {
@@ -7,17 +7,20 @@ type deleteProductDialogProps = {
 
 function DeleteProductDialog({id}: deleteProductDialogProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   async function deleteProduct() {
     try {
-        await productRepository.delete(id)
-        navigate('/products')
+        await productRepository.delete(id);
+        if (location.pathname === '/products') navigate(0);
+        else navigate('/products');
     }
     catch (error) {
         alert(`Erro ao deletar Produto!`);
         console.error(`Erro ao deletar produto: `, error);
         navigate(0)
     }
+
   }
 
   return (

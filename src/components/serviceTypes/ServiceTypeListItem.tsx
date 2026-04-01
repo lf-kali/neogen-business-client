@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import type { ServiceType } from "../../features/serviceType/serviceType.types"
 import Popup from "reactjs-popup";
 import DeleteServiceTypeDialog from "./DeleteServiceTypeDialog";
+import { useEffect, useState } from "react";
 
 interface ServiceTypeListItemProps{
     serviceType: ServiceType;
@@ -10,6 +11,11 @@ interface ServiceTypeListItemProps{
 function ServiceTypeListItem({serviceType}: ServiceTypeListItemProps) {
   const navigate = useNavigate();
 
+  const [logServiceType, setLogServiceType] = useState<ServiceType>(serviceType)
+
+  useEffect(() => {
+    console.log(logServiceType)
+  },[logServiceType])
   return (
     <tr className="border-b border-slate-500/30 hover:bg-slate-50 transition-colors">
       {/* ID */}
@@ -43,7 +49,7 @@ function ServiceTypeListItem({serviceType}: ServiceTypeListItemProps) {
       {/* Comissão */}
       <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/service-types/${serviceType.id}`)}>
         <span className="text-sm text-slate-600 oxanium-400">
-          {`${serviceType.comssionPercent ?? '--'}%`}
+          {serviceType.comissionPercent ? `${serviceType.comissionPercent}%` : '--'}
         </span>
       </td>
 
