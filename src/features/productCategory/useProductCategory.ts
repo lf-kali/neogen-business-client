@@ -9,12 +9,15 @@ export function useProductCategory() {
     const [error, setError] = useState<ApiError | null>(null);
     
     const reload = useCallback(async () => {
+        console.log("CARREGANDO CATEGORIAS...")
+
         setLoading(true);
         setError(null);
 
         try {
             const data = await ProductCategoryRepository.list();
             setCategories(data); 
+            console.log("CATEGORIAS CARREGADAS: ", data )
         }
         catch (e){
             setError(toApiError(e));

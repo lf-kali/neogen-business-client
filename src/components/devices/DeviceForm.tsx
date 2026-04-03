@@ -6,6 +6,8 @@ import type { CreateDevice, DeviceCategory, HandedAccessories, InitialDiagnosis,
 import { deviceRepository } from "../../features/device/device.repository";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { useDevicebrands } from "../../features/deviceBrand/useDeviceBrands";
+import Select from "react-select";
 
 
 type DeviceFormData = {
@@ -19,7 +21,12 @@ function DeviceForm() {
   const {handleLogout} = useAuth();
   const navigate = useNavigate();
   const {id} = useParams<{id:string}>();
-  
+  const {deviceBrands} = useDevicebrands();
+  const [selectedBrand, setSelectedBrand] = useState<{value: number, label: string} | null> (null);
+  const brandOptions = deviceBrands.map(brand => ({ value: brand.id, label: brand.name }));
+  const [selectedModel, setSelectedModel] = useState<{value: number, label: string} | null>(null);
+  const [modelOptions, setModelOptions] = useState<{value: number, label: string}[]>([]);
+
   const [deviceFormData, setDeviceFormData ] = useState<DeviceFormData>({
     problemDescription: '',
     category: undefined,
@@ -61,13 +68,46 @@ function DeviceForm() {
     if (id) {
       getDevice(+id)
     }
-  },[id])
+  },[id]);
+
+  useEffect(() => {
+    if (id && deviceFormData.brandId && deviceBrands.length > 0) {
+      const brand = deviceBrands.find(b => b.id === deviceFormData.brandId);
+      if (brand) {
+        setSelectedBrand({ value: brand.id, label: brand.name });
+        const models = brand.models.map(m => ({ value: m.id, label: m.name }));
+        setModelOptions(models);
+        if (deviceFormData.modelId) {
+          const model = models.find(m => m.value === deviceFormData.modelId);
+          if (model) setSelectedModel(model);
+        }
+      }
+    }
+  }, [deviceBrands]);
 
   function onInputChange<T>(data: T, setData: Dispatch<SetStateAction<T>>, e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     setData({
       ...data,
       [e.target.name]: e.target.value,
     })
+  }
+
+  function onBrandChange(selectedOption: {value: number, label: string} | null) {
+    setSelectedBrand(selectedOption);
+    setDeviceFormData(prev => ({...prev, brandId: selectedOption?.value ?? 0}));
+    setSelectedModel(null);
+
+    if (selectedOption) {
+      const brand = deviceBrands.find(b => b.id === selectedOption.value);
+      setModelOptions(brand?.models.map(m => ({ value: m.id, label: m.name })) ?? []);
+    } else {
+      setModelOptions([]);
+    }
+  }
+
+  function onModelChange(selectedOption: {value: number, label: string} | null) {
+    setSelectedModel(selectedOption);
+    setDeviceFormData(prev => ({ ...prev, modelId: selectedOption?.value ?? 0 }));
   }
   
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -154,28 +194,68 @@ function DeviceForm() {
                 </select>
               </div>
 
-              {/* Brand ID e Model ID */}
+              {/* Brand e Model */}
+              {/* Brand e Model */}
               <div className="grid grid-cols-2 gap-4">
-                <NeogenInput
-                  label="ID da Marca"
-                  id="brandId"
-                  type="number"
-                  name="brandId"
-                  value={deviceFormData.brandId}
-                  onChange={(e) => onInputChange<DeviceFormData>(deviceFormData, setDeviceFormData, e)}
-                  labelStyle={darkLabelStyle}
-                  inputStyle={darkInputStyle}
-                />
-                <NeogenInput
-                  label="ID do Modelo"
-                  id="modelId"
-                  type="number"
-                  name="modelId"
-                  value={deviceFormData.modelId}
-                  onChange={(e) => onInputChange<DeviceFormData>(deviceFormData, setDeviceFormData, e)}
-                  labelStyle={darkLabelStyle}
-                  inputStyle={darkInputStyle}
-                />
+                <div>
+                  <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
+                    Marca
+                  </label>
+                  <Select
+                    options={brandOptions}
+                    value={selectedBrand}
+                    onChange={onBrandChange}
+                    isSearchable
+                    placeholder="Selecione a marca..."
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        backgroundColor: "rgba(255, 255, 255, 0.92)",
+                        borderColor: "rgba(0, 0, 0, 0.28)",
+                        color: "#0f172a",
+                        borderRadius: "0.375rem",
+                        padding: "0.25rem",
+                        minHeight: "2.5rem",
+                      }),
+                      input: (base) => ({ ...base, color: "#0f172a" }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isSelected ? "#0f172a" : state.isFocused ? "#f1f5f9" : "white",
+                        color: state.isSelected ? "white" : "#0f172a",
+                      }),
+                    }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-2 oxanium-700" style={darkLabelStyle}>
+                    Modelo
+                  </label>
+                  <Select
+                    options={modelOptions}
+                    value={selectedModel}
+                    onChange={onModelChange}
+                    isSearchable
+                    isDisabled={!selectedBrand}
+                    placeholder={selectedBrand ? "Selecione o modelo..." : "Selecione uma marca primeiro"}
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        backgroundColor: "rgba(255, 255, 255, 0.92)",
+                        borderColor: "rgba(0, 0, 0, 0.28)",
+                        color: "#0f172a",
+                        borderRadius: "0.375rem",
+                        padding: "0.25rem",
+                        minHeight: "2.5rem",
+                      }),
+                      input: (base) => ({ ...base, color: "#0f172a" }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isSelected ? "#0f172a" : state.isFocused ? "#f1f5f9" : "white",
+                        color: state.isSelected ? "white" : "#0f172a",
+                      }),
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Diagnóstico Inicial */}

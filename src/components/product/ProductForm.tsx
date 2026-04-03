@@ -3,20 +3,24 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import type { CreateProduct, UpdateProduct } from "../../features/product/product.types";
 import { productRepository } from "../../features/product/product.repository";
-import Select from 'react-select'
+import CreatableSelect from 'react-select/creatable';
 import { useProductCategory } from "../../features/productCategory/useProductCategory";
 import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../neogen/neogen-button/NeogenButton";
+import { ProductCategoryRepository } from "../../features/productCategory/productCategory.repository";
 
 function ProductForm() {
   const {handleLogout} = useAuth();
   const navigate = useNavigate();
   const {id} = useParams<{id: string}>();
   const {categories} = useProductCategory()
+  const [selectedCategory, setSelectedCategory] = useState<{value: number, label: string} | null>(null);
+  const categoryOptions = categories.map((category) => {
+      return {value: category.id, label: category.name}
+  });
+  const [extraOptions, setExtraOptions] = useState<{value: number, label: string}[]>([]);
+  const allOptions = [...categoryOptions, ...extraOptions];
 
-  const options = categories.map((category) => {
-    return {value: category.id, label: category.name}
-  })
 
   const [productFormData, setProductFormData] = useState<CreateProduct | UpdateProduct> ({
     name: '',
@@ -31,8 +35,17 @@ function ProductForm() {
 
   async function getProduct(id: number) {
     try {
+        console.log("CARREGANDO PRODUTOS...")
         const product = await productRepository.getById(id);
-        setProductFormData(product);
+        setProductFormData({
+          ...product,
+          categoryId: product.category?.id,
+        });
+        if(product.category) {
+          const match = categoryOptions.find(opt => opt.value === product.category?.id);
+          if (match) setSelectedCategory(match);
+        }
+        console.log("PRODUTO CARREGADO: ", product);
     }
     catch (error: any) {
         if(error.toString().includes('401')) handleLogout();
@@ -42,6 +55,13 @@ function ProductForm() {
   useEffect(() => {
     if (id) getProduct(+id);
   }, [id]);
+
+  useEffect (() => {
+    if (id && productFormData.categoryId && categoryOptions.length > 0) {
+      const match = categoryOptions.find(opt => opt.value === productFormData.categoryId);
+      if (match) setSelectedCategory(match);
+    }
+  }, [categories])
 
   function onInputChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -58,6 +78,30 @@ function ProductForm() {
       ...productFormData,
       categoryId: selectedOption?.value
     })
+
+    setSelectedCategory(selectedOption);
+  }
+
+  async function onCategoryCreate(inputValue: string) {
+    try {
+      const newCategory = await ProductCategoryRepository.create({name: inputValue});
+      const newOption = {value: newCategory.id, label: newCategory.name};
+
+      setProductFormData((prev) => ({
+        ...prev,
+        categoryId: newCategory.id,
+      }))
+
+      console.log(newOption)
+      setExtraOptions(prev => [...prev, newOption]);
+
+      setSelectedCategory(newOption);
+      console.log(selectedCategory)
+      
+    } catch (error: any) {
+      alert("Erro ao criar categoria!");
+      console.error("Erro ao criar categoria: ", error);
+    }
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -81,10 +125,6 @@ function ProductForm() {
     borderColor: "rgba(0, 0, 0, 0.28)",
     color: "#0f172a",
   };
-
-  const selectedCategory = productFormData.categoryId 
-    ? options.find(opt => opt.value === productFormData.categoryId)
-    : null;
 
   return (
     <div
@@ -178,16 +218,18 @@ function ProductForm() {
               />
 
               <div>
-                <label style={darkLabelStyle} className="block text-sm font-medium oxanium-400 mb-2">
+                <label style={darkLabelStyle} className="block text-sm font-medium oxanium-400  mb-2">
                   Categoria (opcional)
                 </label>
-                <Select
-                  options={options}
+                <CreatableSelect
+                  options={allOptions}
                   value={selectedCategory}
                   onChange={onCategoryChange}
+                  onCreateOption={onCategoryCreate}
                   isClearable
                   isSearchable
                   placeholder="Selecione uma categoria..."
+                  formatCreateLabel={(inputValue) => `Criar "${inputValue}"`}
                   styles={{
                     control: (base) => ({
                       ...base,
