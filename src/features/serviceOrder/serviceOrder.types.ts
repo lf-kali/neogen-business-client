@@ -1,5 +1,5 @@
 import type { Costumer } from "../costumer/costumer.types";
-import type { Device } from "../device/device.types";
+import type { PortableDevice } from "../device/types/device.types";
 import type { Product } from "../product/product.types";
 import type { ServiceType } from "../serviceType/serviceType.types";
 import type { Technician } from "../technician/technician.types";
@@ -17,7 +17,7 @@ export type ServiceOrder = {
   finalPrice: number;
   technician: Technician;
   costumer: Costumer;
-  devices: Device[];
+  devices: PortableDevice[];
   products?: Product[];
   services: ServiceType[];
 };

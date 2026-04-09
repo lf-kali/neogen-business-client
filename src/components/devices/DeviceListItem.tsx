@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
-import type { Device } from "../../features/device/device.types";
+import type { PortableDevice } from "../../features/device/types/device.types";
 import Popup from "reactjs-popup";
 import DeleteDeviceDialog from "./DeleteDeviceDialog";
 
 interface DeviceListItemProps {
-  device: Device;
+  device: PortableDevice;
 }
 
 function DeviceListItem({ device }: DeviceListItemProps) {
@@ -105,7 +105,7 @@ function DeviceListItem({ device }: DeviceListItemProps) {
               border: 'none'
             }}
           >
-            <DeleteDeviceDialog id={device.id}/>
+            <DeleteDeviceDialog device={device}/>
           </Popup>
         </div>
       </td>

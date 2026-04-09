@@ -1,17 +1,29 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { deviceRepository } from "../../features/device/device.repository";
+import type { DeviceCategory, PortableDevice } from "../../features/device/types/device.types";
+import type { PortableDeviceRepository } from "../../features/device/hooks/usePortableDeviceRepository";
+import { cellphoneRepository } from "../../features/device/repository/cellphone.repository";
+import { laptopRepository } from "../../features/device/repository/laptop.repository";
+import { tabletRepository } from "../../features/device/repository/tablet.repository";
 
 type deleteDeviceDialogProps = {
-    id: number
+    device: PortableDevice
 }
 
-function DeleteDeviceDialog({id}: deleteDeviceDialogProps) {
+function DeleteDeviceDialog({device}: deleteDeviceDialogProps) {
   const navigate = useNavigate()
   const location = useLocation();
 
+  const repoMap: Record<DeviceCategory, PortableDeviceRepository> = {
+    Cellphone: cellphoneRepository,
+    Laptop: laptopRepository,
+    Tablet: tabletRepository
+  }
+
+  const repo = repoMap[device.type as DeviceCategory]
+
   async function deleteDevice() {
     try {
-        await deviceRepository.remove(id)
+        await repo.remove(device.id)
     } catch (error) {
         alert(`Erro ao deletar dispositivo!`)
         console.error(`Erro ao deletar dispositivo: ${error}`)

@@ -1,6 +1,6 @@
 import DeviceListItem from "./DeviceListItem";
 import { Link,} from "react-router-dom";
-import { useDevices } from "../../features/device/useDevices";
+import { useDevices } from "../../features/device/hooks/useDevices";
 
 function DeviceList() {
   const {devices, loading} = useDevices();

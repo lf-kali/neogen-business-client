@@ -3,9 +3,19 @@ export const endpoints = {
     login: "/technicians/login",
   },
   costumer: "/costumers",
-  device: "/devices",
-  deviceBrand: "/device-brands",
-  deviceModel: "/device-models",
+  portableDevices: {
+    cellphone: "/cellphones",
+    laptop: "/laptops",
+  },
+  portableDeviceBrands: {
+    cellphoneBrand: "/cellphone-brands",
+    laptopBrand: "/laptop-brands",
+  },
+  portableDeviceModels: {
+    cellphoneModel: "/cellphone-models",
+    laptopModel: "/laptop-models",
+  },
+  portableDeviceSearch: "/portable-device-search",
   serviceOrder: "/service-order",
   technician: "/technicians",
   product: "/product",

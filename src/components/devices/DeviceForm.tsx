@@ -1,39 +1,56 @@
-import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
-import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
-import NeogenTextarea from "../neogen/keyboard-input/neogen-textarea/NeogenTextarea";
-import NeogenButton from "../neogen/neogen-button/NeogenButton";
-import type { CreateDevice, DeviceCategory, HandedAccessories, InitialDiagnosis, UpdateDevice } from "../../features/device/device.types";
-import { deviceRepository } from "../../features/device/device.repository";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useDevicebrands } from "../../features/deviceBrand/useDeviceBrands";
+import type { DeviceCategory, HandedAccessories, InitialDiagnosis, PortableDevice } from "../../features/device/types/device.types";
+import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import type { DeviceBrand } from "../../features/deviceBrand/types/deviceBrand.types";
+import type { DeviceModel } from "../../features/deviceModel/deviceModel.types";
+import { portableDeviceSearchRepository } from "../../features/device/repository/portableDeviceSearch.repository";
+import NeogenTextarea from "../neogen/keyboard-input/neogen-textarea/NeogenTextarea";
 import Select from "react-select";
-
+import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
+import NeogenButton from "../neogen/neogen-button/NeogenButton";
+import { useDevicebrands } from "../../features/deviceBrand/hooks/useDeviceBrands";
 
 type DeviceFormData = {
   problemDescription: string;
-  category?: DeviceCategory;
+  type?: DeviceCategory;
   brandId: number;
   modelId: number;
 }
 
 function DeviceForm() {
-  const {handleLogout} = useAuth();
-  const navigate = useNavigate();
-  const {id} = useParams<{id:string}>();
-  const {deviceBrands} = useDevicebrands();
-  const [selectedBrand, setSelectedBrand] = useState<{value: number, label: string} | null> (null);
-  const brandOptions = deviceBrands.map(brand => ({ value: brand.id, label: brand.name }));
-  const [selectedModel, setSelectedModel] = useState<{value: number, label: string} | null>(null);
-  const [modelOptions, setModelOptions] = useState<{value: number, label: string}[]>([]);
 
+  // Base: Autenticação e navegação
+  const {handleLogout} = useAuth();
+
+  // Utilidade da rota devices/edit/:id
+  const {id} = useParams<{id:string}>();
+  const [device, setDevice] = useState<PortableDevice | null>(null)
+
+  // Marcas de celular
+  const {brandList: cellphoneBrands} = useDevicebrands("Cellphone")
+
+  // Marcas de laptop
+  const {brandList: laptopBrands} = useDevicebrands("Laptop");
+
+  // Armazenar marcas de dispositivos
+  const [deviceBrands, setDeviceBrands] = useState<DeviceBrand[]>([]);
+  const [brandOptions, setBrandOptions] = useState<{value: number, label: string}[]>([])
+  const [selectedBrand, setSelectedBrand] = useState<{value: number, label: string} | null> (null);
+
+  // Armazenar modelos de dispositicvos
+  const [modelOptions, setModelOptions] = useState<{value: number, label: string}[]>([]);
+  const [selectedModel, setSelectedModel] = useState<{value: number, label: string} | null>(null);
+
+  // Dados do formulário: Dispositivo
   const [deviceFormData, setDeviceFormData ] = useState<DeviceFormData>({
     problemDescription: '',
-    category: undefined,
+    type: undefined,
     brandId: 0,
     modelId: 0,
   });
 
+  // Dados do formulário: Dispositivo
   const [initialDiagnosisFormdata, setInitialDiagnosisFormdata] = useState<InitialDiagnosis>({
     externalState: '',
     turnsOn: false,
@@ -44,6 +61,7 @@ function DeviceForm() {
     frontalCamera: undefined,
   });
 
+  // Dados do formulário: Dispositivo
   const [handedAccessoriesFormdata, setHandedAccessoriesFormdata] = useState<HandedAccessories>({
     charger: false,
     cable: false,
@@ -51,13 +69,27 @@ function DeviceForm() {
     storageDevice: undefined,
   });
 
-
+  // Carregar dispositivo por id
   async function getDevice(id: number) {
     try {
-      const device = await deviceRepository.getById(id);
-      setDeviceFormData({problemDescription: device.problemDescription, category: device.category, brandId: device.brand.id, modelId: device.model.id});
+      const device = await portableDeviceSearchRepository.getById(id);
+      setDevice(device)
+      setDeviceFormData({problemDescription: device.problemDescription, type: device.type, brandId: device.brand.id, modelId: device.model.id});
       setInitialDiagnosisFormdata(device.initialDiagnosis);
       setHandedAccessoriesFormdata(device.handedAccessories);
+      
+      if (device.type) {
+        const listMap: Record<DeviceCategory, DeviceBrand[]> = {
+          Cellphone: cellphoneBrands,
+          Laptop: laptopBrands,
+        };
+        const brandList = listMap[device.type];
+        setDeviceBrands(brandList);
+        setBrandOptions(brandList.map((brand: DeviceBrand) => ({ value: brand.id, label: brand.name })));
+        setSelectedBrand({ value: device.brand.id, label: device.brand.name });
+        setSelectedModel({ value: device.model.id, label: device.model.name });
+        setModelOptions(device.brand.models.map((model: DeviceModel) => ({ value: model.id, label: model.name })));
+      }
       
     } catch (error: any) {
       if(error.toString().includes('401')) handleLogout()
@@ -71,20 +103,40 @@ function DeviceForm() {
   },[id]);
 
   useEffect(() => {
-    if (id && deviceFormData.brandId && deviceBrands.length > 0) {
-      const brand = deviceBrands.find(b => b.id === deviceFormData.brandId);
-      if (brand) {
-        setSelectedBrand({ value: brand.id, label: brand.name });
-        const models = brand.models.map(m => ({ value: m.id, label: m.name }));
-        setModelOptions(models);
-        if (deviceFormData.modelId) {
-          const model = models.find(m => m.value === deviceFormData.modelId);
-          if (model) setSelectedModel(model);
-        }
-      }
+    if (deviceFormData.type) {
+      const listMap: Record<DeviceCategory, DeviceBrand[]> = {
+        Cellphone: cellphoneBrands,
+        Laptop: laptopBrands,
+      };
+      const brandList = listMap[deviceFormData.type];
+      setDeviceBrands(brandList);
+      setBrandOptions(brandList.map((brand: DeviceBrand) => ({ value: brand.id, label: brand.name })));
+    } else {
+      setDeviceBrands([]);
+      setBrandOptions([]);
     }
-  }, [deviceBrands]);
+  }, [deviceFormData.type, cellphoneBrands, laptopBrands]);
 
+  // Evento de mudança de tipo de dispositivo
+  function onTypeChange(e: ChangeEvent<HTMLSelectElement>) {
+    const newType = e.target.value as DeviceCategory;
+    setDeviceFormData(prev => ({
+      ...prev,
+      type: newType,
+    }));
+    const listMap: Record<DeviceCategory, DeviceBrand[]> = {
+      Cellphone: cellphoneBrands,
+      Laptop: laptopBrands,
+    };
+    const brandList = newType ? listMap[newType] : [];
+    setDeviceBrands(brandList);
+    setBrandOptions(brandList.map(brand => ({ value: brand.id, label: brand.name })));
+    setSelectedBrand(null);
+    setSelectedModel(null);
+    setModelOptions([]);
+  }
+
+  // Atualizar dados do formulário com mudança de input
   function onInputChange<T>(data: T, setData: Dispatch<SetStateAction<T>>, e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     setData({
       ...data,
@@ -92,48 +144,33 @@ function DeviceForm() {
     })
   }
 
-  function onBrandChange(selectedOption: {value: number, label: string} | null) {
-    setSelectedBrand(selectedOption);
-    setDeviceFormData(prev => ({...prev, brandId: selectedOption?.value ?? 0}));
-    setSelectedModel(null);
-
-    if (selectedOption) {
-      const brand = deviceBrands.find(b => b.id === selectedOption.value);
-      setModelOptions(brand?.models.map(m => ({ value: m.id, label: m.name })) ?? []);
+  // Evento de mudança de marca
+  function onBrandChange(selected: {value: number, label: string} | null){
+    setSelectedBrand(selected);
+    if (selected) {
+      const brand = deviceBrands.find(b => b.id === selected.value);
+      if (brand) {
+        setModelOptions(brand.models.map((model: DeviceModel) => ({ value: model.id, label: model.name })));
+      }
     } else {
       setModelOptions([]);
     }
+    setSelectedModel(null);
   }
 
+  // Evento de mudança de Modelo
   function onModelChange(selectedOption: {value: number, label: string} | null) {
     setSelectedModel(selectedOption);
     setDeviceFormData(prev => ({ ...prev, modelId: selectedOption?.value ?? 0 }));
   }
-  
+
+  // Evento de envio de formulário
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const payload: CreateDevice | UpdateDevice= {
-      ...deviceFormData,
-      brandId: +deviceFormData.brandId,
-      modelId: +deviceFormData.modelId,
-      initialDiagnosis: initialDiagnosisFormdata,
-      handedAccessories: handedAccessoriesFormdata
-    } 
-
-    console.log(payload)
-
-    try {
-      if (!id) await deviceRepository.create(payload as CreateDevice)
-      else await deviceRepository.update(+id, payload as UpdateDevice)
-      navigate('/devices')
-    }
-    catch (e) {
-      alert("Erro ao salvar dispositivo!")
-      console.error("Erro ao salvar dispositivo: ", e)
-    }
+    console.log(deviceFormData, initialDiagnosisFormdata, handedAccessoriesFormdata);
   }
 
-  
+  // Estilos de Label e input
   const darkLabelStyle = { color: "rgba(0, 0, 0, 0.75)" };
   const darkInputStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.92)",
@@ -141,6 +178,7 @@ function DeviceForm() {
     color: "#0f172a",
   };
 
+  // Html + CSS
   return (
     <div
       className="flex flex-col items-center px-4 md:py-6 sm:py-10"
@@ -179,22 +217,20 @@ function DeviceForm() {
                   Categoria do Dispositivo
                 </label>
                 <select
-                  id="category"
-                  name="category"
-                  value={deviceFormData.category || ''}
-                  onChange={(e) => onInputChange<DeviceFormData>(deviceFormData, setDeviceFormData, e)}
+                  id="type"
+                  name="type"
+                  value={deviceFormData.type || ''}
+                  onChange={onTypeChange}
                   className="w-full px-4 py-2 rounded-lg border outline-none focus:ring-2 transition-all oxanium-400"
                   style={darkInputStyle}
                 >
                   <option value="">Selecione uma categoria</option>
-                  <option value="cellphone">Celular</option>
-                  <option value="laptop">Notebook</option>
-                  <option value="pc">PC</option>
-                  <option value="tablet">Tablet</option>
+                  <option value="Cellphone">Celular</option>
+                  <option value="Laptop">Notebook</option>
+                  <option value="Tablet">Tablet</option>
                 </select>
               </div>
 
-              {/* Brand e Model */}
               {/* Brand e Model */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -472,4 +508,4 @@ function DeviceForm() {
   );
 }
 
-export default DeviceForm;
+export default DeviceForm

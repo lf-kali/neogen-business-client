@@ -1,18 +1,18 @@
-import type { DeviceBrand } from "../deviceBrand/deviceBrand.types";
-import type { DeviceModel } from "../deviceModel/deviceModel.types";
-import type { ServiceOrder } from "../serviceOrder/serviceOrder.types";
+import type { DeviceBrand } from "../../deviceBrand/types/deviceBrand.types";
+import type { DeviceModel } from "../../deviceModel/deviceModel.types";
+import type { ServiceOrder } from "../../serviceOrder/serviceOrder.types";
 
-export type DeviceCategory = 'cellphone' | 'laptop' | 'pc' | 'tablet';
+export type DeviceCategory = 'Cellphone' | 'Laptop';
 
-export type Device = {
+export interface PortableDevice {
   id: number;
   problemDescription: string;
-  category?: DeviceCategory;
   brand: DeviceBrand;
   model: DeviceModel;
   initialDiagnosis: InitialDiagnosis;
   handedAccessories: HandedAccessories;
   serviceOrder?: ServiceOrder;
+  type?: DeviceCategory,
 };
 
 export type InitialDiagnosis = {
@@ -24,6 +24,7 @@ export type InitialDiagnosis = {
   rearCamera?: 'ok' | 'damaged' | 'not_working';
   frontalCamera?: 'ok' | 'damaged' | 'not_working';
   touch?: 'ok' | 'damaged' | 'phantom_touch' | 'not_working';
+  notes?: string
 }
 
 export type HandedAccessories = {
@@ -31,9 +32,10 @@ export type HandedAccessories = {
   cable: boolean;
   case: boolean;
   storageDevice?:'sd_card' | 'flash_drive' | 'external_hdd' | 'external_ssd';
+  other?: string;
 }
 
-export type CreateDevice = {
+export type CreatePortableDevice = {
   problemDescription: string;
   category: DeviceCategory;
   brandId: number;
@@ -42,4 +44,4 @@ export type CreateDevice = {
   handedAccessories: HandedAccessories;
 }
 
-export type UpdateDevice = Partial<CreateDevice>
+export type UpdatePortableDevice = Partial<CreatePortableDevice>

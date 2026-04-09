@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import type { Device, DeviceCategory, HandedAccessories, InitialDiagnosis } from "../../features/device/device.types";
-import { deviceRepository } from "../../features/device/device.repository";
+import type { PortableDevice, DeviceCategory, HandedAccessories, InitialDiagnosis } from "../../features/device/types/device.types";
 import DeleteDeviceDialog from "./DeleteDeviceDialog";
 import Popup from "reactjs-popup";
-import type { DeviceBrand } from "../../features/deviceBrand/deviceBrand.types";
+import type { DeviceBrand } from "../../features/deviceBrand/types/deviceBrand.types";
 import type { DeviceModel } from "../../features/deviceModel/deviceModel.types";
+import { portableDeviceSearchRepository } from "../../features/device/repository/portableDeviceSearch.repository";
 
 function DeviceDetails() {
   const { id } = useParams<{ id: string }>();
-  const [device, setDevice] = useState<Device>({
+  const [device, setDevice] = useState<PortableDevice>({
     id: 0,
     problemDescription: '',
-    category: undefined,
+    type: undefined,
     brand: {} as DeviceBrand,
     model: {} as DeviceModel,
     initialDiagnosis: {} as InitialDiagnosis,
@@ -27,7 +27,7 @@ function DeviceDetails() {
     setError(null);
 
     try {
-      const data = await deviceRepository.getById(id);
+      const data = await portableDeviceSearchRepository.getById(id);
       setDevice(data);
     } catch (e) {
       setError("Erro ao buscar dispositivo!");
@@ -57,19 +57,18 @@ function DeviceDetails() {
   }, [device?.brand?.name, device?.model?.name, device?.id, loading]);
 
   const displayId = device?.id ? String(device.id) : "—";
-  const displayCategory = device?.category ? mapCategoryToPortuguese(device.category) : "—";
+  const displayCategory = device?.type ? mapCategoryToPortuguese(device.type) : "—";
   const displayBrand = device?.brand?.name?.trim() ? device.brand.name : "—";
   const displayModel = device?.model?.name?.trim() ? device.model.name : "—";
   const displayProblem = device?.problemDescription?.trim() ? device.problemDescription : "—";
 
-  function mapCategoryToPortuguese(category: DeviceCategory): string {
+  function mapCategoryToPortuguese(type: DeviceCategory): string {
     const categoryMap: Record<DeviceCategory, string> = {
-      cellphone: "Celular",
-      laptop: "Notebook",
-      pc: "Computador",
-      tablet: "Tablet",
+      Cellphone: "Celular",
+      Laptop: "Notebook",
+      Tablet: "Tablet",
     };
-    return categoryMap[category];
+    return categoryMap[type];
   }
 
   function mapDiagnosisStatus(status: string): string {
@@ -168,7 +167,7 @@ function DeviceDetails() {
                   border: 'none'
                 }}
               >
-                <DeleteDeviceDialog id={device.id}/>
+                <DeleteDeviceDialog device={device}/>
               </Popup>
             </div>
           </div>

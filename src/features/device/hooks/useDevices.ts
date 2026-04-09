@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Device } from "./device.types";
-import { type ApiError, toApiError } from "../../api/http/apiError";
-import { deviceRepository } from "./device.repository";
+import type { PortableDevice } from "../types/device.types";
+import { type ApiError, toApiError } from "../../../api/http/apiError";
+import { portableDeviceSearchRepository } from "../repository/portableDeviceSearch.repository";
 
 
 export function useDevices() {
-    const [devices, setDevices] = useState<Device[]>([]);
+    const [devices, setDevices] = useState<PortableDevice[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<ApiError | null>(null);
 
@@ -14,7 +14,7 @@ export function useDevices() {
         setError(null);
 
         try {
-            const data = await deviceRepository.list();
+            const data = await portableDeviceSearchRepository.list();
             setDevices(data);
         } catch (error) {
             setError(toApiError(error));
