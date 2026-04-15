@@ -1,6 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import type { DeviceCategory, HandedAccessories, InitialDiagnosis, PortableDevice } from "../../features/device/types/device.types";
+import type { CreatePortableDevice, DeviceCategory, HandedAccessories, InitialDiagnosis, PortableDevice, UpdatePortableDevice } from "../../features/device/types/device.types";
 import { useEffect, useState, type ChangeEvent, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import type { DeviceBrand } from "../../features/deviceBrand/types/deviceBrand.types";
 import type { DeviceModel } from "../../features/deviceModel/deviceModel.types";
@@ -10,6 +10,16 @@ import Select from "react-select";
 import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../neogen/neogen-button/NeogenButton";
 import { useDevicebrands } from "../../features/deviceBrand/hooks/useDeviceBrands";
+import type { PortableDeviceRepository } from "../../features/device/hooks/usePortableDeviceRepository";
+import { cellphoneRepository } from "../../features/device/repository/cellphone.repository";
+import { laptopRepository } from "../../features/device/repository/laptop.repository";
+
+
+type DeviceFormProps = {
+  entityId?: number;
+  onCreated?: (device: PortableDevice) => void;
+  onUpdated?: (device: PortableDevice) => void;
+};
 
 type DeviceFormData = {
   problemDescription: string;
@@ -18,14 +28,11 @@ type DeviceFormData = {
   modelId: number;
 }
 
-function DeviceForm() {
+function DeviceForm({ entityId, onCreated, onUpdated }: DeviceFormProps) {
 
   // Base: Autenticação e navegação
   const {handleLogout} = useAuth();
-
-  // Utilidade da rota devices/edit/:id
-  const {id} = useParams<{id:string}>();
-  const [device, setDevice] = useState<PortableDevice | null>(null)
+  const navigate = useNavigate();
 
   // Marcas de celular
   const {brandList: cellphoneBrands} = useDevicebrands("Cellphone")
@@ -50,7 +57,7 @@ function DeviceForm() {
     modelId: 0,
   });
 
-  // Dados do formulário: Dispositivo
+  // Dados do formulário: Diagnóstico inicial
   const [initialDiagnosisFormdata, setInitialDiagnosisFormdata] = useState<InitialDiagnosis>({
     externalState: '',
     turnsOn: false,
@@ -59,22 +66,23 @@ function DeviceForm() {
     battery: undefined,
     rearCamera: undefined,
     frontalCamera: undefined,
+    notes: undefined,
   });
 
-  // Dados do formulário: Dispositivo
+  // Dados do formulário: Acessórios
   const [handedAccessoriesFormdata, setHandedAccessoriesFormdata] = useState<HandedAccessories>({
     charger: false,
     cable: false,
     case: false,
     storageDevice: undefined,
+    other: undefined,
   });
 
   // Carregar dispositivo por id
   async function getDevice(id: number) {
     try {
       const device = await portableDeviceSearchRepository.getById(id);
-      setDevice(device)
-      setDeviceFormData({problemDescription: device.problemDescription, type: device.type, brandId: device.brand.id, modelId: device.model.id});
+      setDeviceFormData({problemDescription: device.problemDescription, type: device.type, brandId: device.brand.id, modelId: device.model.id,});
       setInitialDiagnosisFormdata(device.initialDiagnosis);
       setHandedAccessoriesFormdata(device.handedAccessories);
       
@@ -97,10 +105,10 @@ function DeviceForm() {
     
   }
   useEffect(()=>{
-    if (id) {
-      getDevice(+id)
+    if (entityId) {
+      getDevice(+entityId)
     }
-  },[id]);
+  },[entityId]);
 
   useEffect(() => {
     if (deviceFormData.type) {
@@ -151,6 +159,10 @@ function DeviceForm() {
       const brand = deviceBrands.find(b => b.id === selected.value);
       if (brand) {
         setModelOptions(brand.models.map((model: DeviceModel) => ({ value: model.id, label: model.name })));
+        setDeviceFormData({
+          ...deviceFormData,
+          brandId: selected.value
+        })
       }
     } else {
       setModelOptions([]);
@@ -166,8 +178,41 @@ function DeviceForm() {
 
   // Evento de envio de formulário
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
+
+    const repoMap: Record<DeviceCategory, PortableDeviceRepository> = {
+      Cellphone: cellphoneRepository,
+      Laptop: laptopRepository,
+    }
+
+    const repo = repoMap[deviceFormData.type as DeviceCategory]
+
     e.preventDefault();
-    console.log(deviceFormData, initialDiagnosisFormdata, handedAccessoriesFormdata);
+    const payload: CreatePortableDevice | UpdatePortableDevice= {
+      ...deviceFormData,
+      brandId: +deviceFormData.brandId,
+      modelId: +deviceFormData.modelId,
+      initialDiagnosis: initialDiagnosisFormdata,
+      handedAccessories: handedAccessoriesFormdata
+    } 
+
+    console.log(payload)
+
+    try {
+      if (!entityId) {
+        const created = await repo.create(payload as CreatePortableDevice);
+        if (onCreated) {
+          onCreated(created);
+          return;
+        }
+      } else {
+        await repo.update(+entityId, payload as UpdatePortableDevice);
+      }
+      navigate('/devices');
+    }
+    catch (e) {
+      alert("Erro ao salvar dispositivo!")
+      console.error("Erro ao salvar dispositivo: ", e)
+    }
   }
 
   // Estilos de Label e input
@@ -187,7 +232,7 @@ function DeviceForm() {
       <div className="w-full max-w-2xl lg:max-w-6xl rounded-[32px] bg-white/75 shadow-2xl backdrop-blur border border-white/60 overflow-hidden">
         <div className="p-3 sm:p-8 lg:p-12">
             <div className="mb-6 sm:mb-8">
-              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{id ? 'Editar dados de Dispositivo' : 'Novo Dispositivo'}</h2>
+              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{entityId ? 'Editar dados de Dispositivo' : 'Novo Dispositivo'}</h2>
               <p className="mt-2 text-xs sm:text-sm text-slate-500 oxanium-400">
                 Preencha as informações do dispositivo.
               </p>
@@ -227,7 +272,6 @@ function DeviceForm() {
                   <option value="">Selecione uma categoria</option>
                   <option value="Cellphone">Celular</option>
                   <option value="Laptop">Notebook</option>
-                  <option value="Tablet">Tablet</option>
                 </select>
               </div>
 
@@ -428,7 +472,18 @@ function DeviceForm() {
                       <option value="phantom_touch">Phantom Touch</option>
                       <option value="not_working">Não Funciona</option>
                     </select>
-                  </div>
+                  </div>                
+                  <NeogenTextarea
+                    label="Notas"
+                    id="notes"
+                    name="notes"
+                    placeholder="Observações adicionais."
+                    rows={4}
+                    labelStyle={darkLabelStyle}
+                    inputStyle={darkInputStyle}
+                    value={initialDiagnosisFormdata.notes}
+                    onChange={(e) => onInputChange<InitialDiagnosis>(initialDiagnosisFormdata, setInitialDiagnosisFormdata, e)}
+                  />
                 </div>
               </fieldset>
 
@@ -495,6 +550,17 @@ function DeviceForm() {
                       <option value="external_ssd">SSD Externo</option>
                     </select>
                   </div>
+                  <NeogenInput
+                    label="Outros"
+                    id="other"
+                    type="text"
+                    name="other"
+                    placeholder="Por favor, especifique."
+                    labelStyle={darkLabelStyle}
+                    inputStyle={darkInputStyle}
+                    value={handedAccessoriesFormdata.other}
+                    onChange={(e) => onInputChange<HandedAccessories>(handedAccessoriesFormdata, setHandedAccessoriesFormdata, e)}
+                  />
                 </div>
               </fieldset>
 

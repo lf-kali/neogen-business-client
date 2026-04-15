@@ -7,6 +7,7 @@ export type DeviceCategory = 'Cellphone' | 'Laptop';
 export interface PortableDevice {
   id: number;
   problemDescription: string;
+  entryDate: string;
   brand: DeviceBrand;
   model: DeviceModel;
   initialDiagnosis: InitialDiagnosis;

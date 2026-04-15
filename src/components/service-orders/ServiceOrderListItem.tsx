@@ -1,42 +1,42 @@
 import { Link, useNavigate } from "react-router-dom";
-import type { PortableDevice } from "../../features/device/types/device.types";
+import type { ServiceOrder } from "../../features/serviceOrder/serviceOrder.types";
 import Popup from "reactjs-popup";
-import DeleteDeviceDialog from "./DeleteDeviceDialog";
+import DeleteServiceOrderDialog from "./DeleteServiceOrderDialog";
 
-interface DeviceListItemProps {
-  device: PortableDevice;
+interface ServiceOrderListItemProps {
+    serviceOrder: ServiceOrder;
 }
 
-function DeviceListItem({ device }: DeviceListItemProps) {
+function ServiceOrderListItem({serviceOrder}: ServiceOrderListItemProps) {
   const navigate = useNavigate()
 
   return (
     <tr className="border-b border-slate-500/30 hover:bg-slate-50 transition-colors">
       {/* ID */}
-      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/devices/${device.id}`)}>
+      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/service-orders/${serviceOrder.id}`)}>
         <span className="text-sm text-slate-600 oxanium-400">
-          {device.id}
+          {serviceOrder.id}
         </span>
       </td>
 
       {/* Data de entrada */}
-      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/devices/${device.id}`)}>
+      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/service-orders/${serviceOrder.id}`)}>
         <span className="text-sm font-medium text-slate-900 oxanium-400">
-          {device.entryDate ?? '--'}
+          {serviceOrder.entryDate}
         </span>
       </td>
 
-      {/* Marca/Modelo */}
-      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/devices/${device.id}`)}>
+      {/* Nome cliente */}
+      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/service-orders/${serviceOrder.id}`)}>
         <span className="text-sm text-slate-600 oxanium-400">
-          {`${device.brand?.name ?? '--'}/${device.model?.name ?? '--'}`}
+          {serviceOrder.costumer.name}
         </span>
       </td>
 
-      {/* CLIENTE RESPONSÁVEL */}
-      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/devices/${device.id}`)}>
+      {/* Prazo */}
+      <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/service-orders/${serviceOrder.id}`)}>
         <span className="text-sm text-slate-600 oxanium-400">
-          {device.serviceOrder?.costumer?.name ?? '--'}
+          {serviceOrder.deadline}
         </span>
       </td>
 
@@ -45,9 +45,9 @@ function DeviceListItem({ device }: DeviceListItemProps) {
         <div className="flex items-center gap-2">
           {/* Botão Editar */}
           <Link
-            to={`/devices/edit/${device.id}`}
+            to={`/service-orders/edit/${serviceOrder.id}`}
             className="p-1.5 rounded hover:bg-blue-100 text-slate-600 hover:text-blue-600 transition-colors"
-            aria-label={`Editar ${device.model?.name ?? '--'} de ${device.serviceOrder?.costumer?.name ?? '--'}`}
+            aria-label={`Editar Ordem de Serviço ${serviceOrder.id}`}
           >
             <svg
               width="16"
@@ -68,7 +68,7 @@ function DeviceListItem({ device }: DeviceListItemProps) {
             trigger={
               <button
                 className="p-1.5 rounded hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors cursor-pointer"
-                aria-label={`Deletar ${device.model?.name ?? '--'} de ${device.serviceOrder?.costumer?.name ?? '--'}`}
+                aria-label={`Deletar ordem de serviço ${serviceOrder.id}`}
               >
                 <svg
                   width="16"
@@ -105,12 +105,12 @@ function DeviceListItem({ device }: DeviceListItemProps) {
               border: 'none'
             }}
           >
-            <DeleteDeviceDialog device={device}/>
+            <DeleteServiceOrderDialog id={serviceOrder.id}/>
           </Popup>
         </div>
       </td>
     </tr>
-  );
+  )
 }
 
-export default DeviceListItem;
+export default ServiceOrderListItem

@@ -66,7 +66,6 @@ function DeviceDetails() {
     const categoryMap: Record<DeviceCategory, string> = {
       Cellphone: "Celular",
       Laptop: "Notebook",
-      Tablet: "Tablet",
     };
     return categoryMap[type];
   }

@@ -1,18 +1,23 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import type { CreateProduct, UpdateProduct } from "../../features/product/product.types";
+import type { CreateProduct, Product, UpdateProduct } from "../../features/product/product.types";
 import { productRepository } from "../../features/product/product.repository";
 import CreatableSelect from 'react-select/creatable';
+
+type ProductFormProps = {
+  entityId?: number;
+  onCreated?: (product: Product) => void;
+  onUpdated?: (product: Product) => void;
+};
 import { useProductCategory } from "../../features/productCategory/useProductCategory";
 import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../neogen/neogen-button/NeogenButton";
 import { ProductCategoryRepository } from "../../features/productCategory/productCategory.repository";
 
-function ProductForm() {
+function ProductForm({ entityId, onCreated, onUpdated }: ProductFormProps) {
   const {handleLogout} = useAuth();
   const navigate = useNavigate();
-  const {id} = useParams<{id: string}>();
   const {categories} = useProductCategory()
   const [selectedCategory, setSelectedCategory] = useState<{value: number, label: string} | null>(null);
   const categoryOptions = categories.map((category) => {
@@ -53,11 +58,11 @@ function ProductForm() {
   }
 
   useEffect(() => {
-    if (id) getProduct(+id);
-  }, [id]);
+    if (entityId) getProduct(+entityId);
+  }, [entityId]);
 
   useEffect (() => {
-    if (id && productFormData.categoryId && categoryOptions.length > 0) {
+    if (entityId && productFormData.categoryId && categoryOptions.length > 0) {
       const match = categoryOptions.find(opt => opt.value === productFormData.categoryId);
       if (match) setSelectedCategory(match);
     }
@@ -109,8 +114,15 @@ function ProductForm() {
     console.log(productFormData)
 
     try {
-        if(!id) await productRepository.create(productFormData as CreateProduct);
-        else await productRepository.update(+id, productFormData as UpdateProduct);
+        if (!entityId) {
+          const created = await productRepository.create(productFormData as CreateProduct);
+          if (onCreated) {
+            onCreated(created);
+            return;
+          }
+        } else {
+          await productRepository.update(+entityId, productFormData as UpdateProduct);
+        }
         navigate('/products');
     }
     catch (e: any) {
@@ -134,7 +146,7 @@ function ProductForm() {
       <div className="w-full max-w-2xl lg:max-w-6xl rounded-[32px] bg-white/75 shadow-2xl backdrop-blur border border-white/60 overflow-hidden">
         <div className="p-3 sm:p-8 lg:p-12">
             <div className="mb-6 sm:mb-8">
-              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{id ? 'Editar dados de produto' : 'Novo produto'}</h2>
+              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{entityId ? 'Editar dados de produto' : 'Novo produto'}</h2>
               <p className="mt-2 text-xs sm:text-sm text-slate-500 oxanium-400">
                 Preencha as informações para adicionar o produto ao catálogo.
               </p>

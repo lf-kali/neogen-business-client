@@ -1,35 +1,22 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext"
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
-import NeogenButton from "../neogen/neogen-button/NeogenButton";
-import type { CreateProductCategory, ProductCategory, UpdateProductCategory } from "../../features/productCategory/productCategory.types";
-import { ProductCategoryRepository } from "../../features/productCategory/productCategory.repository";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import NeogenInput from "../../neogen/keyboard-input/neogen-input/NeogenInput";
+import NeogenButton from "../../neogen/neogen-button/NeogenButton";
+import { useAuth } from "../../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import type { ProductCategory } from "../../../features/productCategory/productCategory.types";
+import { ProductCategoryRepository } from "../../../features/productCategory/productCategory.repository";
 
-function ProductCategoryForm() {
+interface ProductCategoryFormData {
+    name: string;
+}
+
+function CreateProductCategoryForm() {
   const {handleLogout} = useAuth();
   const navigate = useNavigate();
-  const {id} = useParams<{id: string}>();
-  
-  const [productCategoryFormData, setProductCategoryFormData] = useState<CreateProductCategory | UpdateProductCategory>({
+
+  const [productCategoryFormData, setProductCategoryFormData] = useState<ProductCategoryFormData>({
     name: '',
-  })
-
-  async function getCategory(id: number) {
-    try {
-      const category = await ProductCategoryRepository.getById(id);
-      setProductCategoryFormData(category);
-
-    } catch (error: any) {
-      if(error.toString().includes('401')) handleLogout();  
-    }
-  }
-
-  useEffect(() => {
-    if (id) {
-        getCategory(+id);
-    }
-  },[id]);
+  });
 
   function onInputChange(e: ChangeEvent<HTMLInputElement>) {
     setProductCategoryFormData({
@@ -43,17 +30,19 @@ function ProductCategoryForm() {
     console.log(productCategoryFormData);
     let res: ProductCategory;
 
-    try {
-      if(!id) res = await ProductCategoryRepository.create(productCategoryFormData as CreateProductCategory);
-      else res = await ProductCategoryRepository.update(+id, productCategoryFormData as UpdateProductCategory);   
-      navigate(`/product-categories/${res.id}`)
-    } catch (error) {
-      alert("Erro ao salvar categoria!");
-      console.error("Erro ao salvar categoria: ", error);
+    try {        
+        res = await ProductCategoryRepository.create(productCategoryFormData);
+        navigate(`product-categories/${res.id}`);
+
+    } 
+    catch (error:any) {
+        if(error.toString().includes('401')) handleLogout();
+
+        alert("Erro ao salvar categoria!");
+        console.error("Erro ao salvar categoria: ", error);
     }
-    
   }
-  
+
   const darkLabelStyle = { color: "rgba(0, 0, 0, 0.75)" };
   const darkInputStyle = {
     backgroundColor: "rgba(255, 255, 255, 0.92)",
@@ -69,7 +58,7 @@ function ProductCategoryForm() {
       <div className="w-full max-w-2xl lg:max-w-6xl rounded-[32px] bg-white/75 shadow-2xl backdrop-blur border border-white/60 overflow-hidden">
         <div className="p-3 sm:p-8 lg:p-12">
             <div className="mb-6 sm:mb-8">
-              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{id ? 'Editar categoria de produto' : 'Nova categoria de produto'}</h2>
+              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{'Nova categoria de produto'}</h2>
               <p className="mt-2 text-xs sm:text-sm text-slate-500 oxanium-400">
                 Preencha o nome da categoria para organizar seus produtos.
               </p>
@@ -102,4 +91,4 @@ function ProductCategoryForm() {
   );
 }
 
-export default ProductCategoryForm
+export default CreateProductCategoryForm

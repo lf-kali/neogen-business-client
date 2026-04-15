@@ -11,7 +11,7 @@ export type ServiceOrder = {
   deadline: string;
   status: ServiceOrderStatus;
   entryDate: string;
-  techNotes: string;
+  techNotes?: string;
   closureDate?: string;
   closureNotes?: string;
   finalPrice: number;
@@ -23,8 +23,9 @@ export type ServiceOrder = {
 };
 
 export type CreateServiceOrder = {
-  deadline: Date;
+  deadline: string;
   status: ServiceOrderStatus;
+  techNotes?: string;
   technicianId: number;
   costumerId: number;
   deviceIDs: number[];

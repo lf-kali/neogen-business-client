@@ -1,37 +1,28 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import type { DeviceCategory, PortableDevice } from "../../features/device/types/device.types";
-import type { PortableDeviceRepository } from "../../features/device/hooks/usePortableDeviceRepository";
-import { cellphoneRepository } from "../../features/device/repository/cellphone.repository";
-import { laptopRepository } from "../../features/device/repository/laptop.repository";
+import { serviceOrderRepository } from "../../features/serviceOrder/serviceOrder.repository";
 
-type deleteDeviceDialogProps = {
-    device: PortableDevice
+
+type deleteServiceOrderDialogProps = {
+    id: number;
 }
 
-function DeleteDeviceDialog({device}: deleteDeviceDialogProps) {
-  const navigate = useNavigate()
-  const location = useLocation();
+function DeleteServiceOrderDialog({id}: deleteServiceOrderDialogProps) {
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  const repoMap: Record<DeviceCategory, PortableDeviceRepository> = {
-    Cellphone: cellphoneRepository,
-    Laptop: laptopRepository,
-  }
+    async function deleteServiceOrder() {
+        try {
+            await serviceOrderRepository.delete(id)
+        } catch (error) {
+            alert(`Erro ao deletar Ordem de serviço!`);
+            console.error(`Erro ao deletar Ordem de serviço: ${error}`);
+        }
 
-  const repo = repoMap[device.type as DeviceCategory]
-
-  async function deleteDevice() {
-    try {
-        await repo.remove(device.id)
-    } catch (error) {
-        alert(`Erro ao deletar dispositivo!`)
-        console.error(`Erro ao deletar dispositivo: ${error}`)
+        if (location.pathname === '/service-orders') navigate(0);
+        else navigate('/service-orders');
     }
 
-    if (location.pathname === '/devices') navigate(0);
-    else navigate('/devices')
-  }
-
-  return (
+    return (
     <div className="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-red-50 to-red-50/50 border-b border-red-200/30 px-6 py-5">
@@ -60,7 +51,7 @@ function DeleteDeviceDialog({device}: deleteDeviceDialogProps) {
       {/* Body */}
       <div className="px-6 py-6">
         <p className="text-sm text-slate-700 leading-relaxed mb-4">
-          Você tem certeza que deseja deletar este dispositivo? Esta ação é
+          Você tem certeza que deseja deletar esta ordem de serviço? Esta ação é
           <span className="font-semibold text-red-600"> irreversível</span> e não poderá ser desfeita.
         </p>
         
@@ -81,13 +72,13 @@ function DeleteDeviceDialog({device}: deleteDeviceDialogProps) {
         </button>
         <button
           className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-700 hover:bg-red-800 active:scale-95 transition-all duration-200 oxanium-600 shadow-md hover:shadow-lg"
-          onClick={deleteDevice}
+          onClick={deleteServiceOrder}
         >
-          Deletar Dispositivo
+          Deletar Ordem de serviço
         </button>
       </div>
     </div>
   );
 }
 
-export default DeleteDeviceDialog
+export default DeleteServiceOrderDialog;

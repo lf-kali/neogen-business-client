@@ -1,15 +1,20 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { type CreateServiceType, type UpdateServiceType } from "../../features/serviceType/serviceType.types";
+import type { CreateServiceType, ServiceType, UpdateServiceType } from "../../features/serviceType/serviceType.types";
 import { serviceTypeRepository } from "../../features/serviceType/serviceType.repository";
 import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../neogen/neogen-button/NeogenButton";
 
-function ServiceTypeForm() {
+type ServiceTypeFormProps = {
+  entityId?: number;
+  onCreated?: (serviceType: ServiceType) => void;
+  onUpdated?: (serviceType: ServiceType) => void;
+};
+
+function ServiceTypeForm({ entityId, onCreated, onUpdated }: ServiceTypeFormProps) {
   const {handleLogout} = useAuth();
   const navigate = useNavigate();
-  const {id} = useParams<{id: string}>();
 
   const [serviceTypeFormData, setServiceTypeFormData] = useState<CreateServiceType | UpdateServiceType>({
     name: '',
@@ -29,8 +34,8 @@ function ServiceTypeForm() {
   }
   
   useEffect(() => {
-    if (id) getServiceType(+id);
-  },[id]);
+    if (entityId) getServiceType(+entityId);
+  },[entityId]);
 
   function onInputChange(e: ChangeEvent<HTMLInputElement>) {
     const {name, value} = e.target;
@@ -47,8 +52,15 @@ function ServiceTypeForm() {
     console.log(serviceTypeFormData);
 
     try {
-      if (!id) await serviceTypeRepository.create(serviceTypeFormData as CreateServiceType);
-      else await serviceTypeRepository.update(+id, serviceTypeFormData as UpdateServiceType);
+      if (!entityId) {
+        const created = await serviceTypeRepository.create(serviceTypeFormData as CreateServiceType);
+        if (onCreated) {
+          onCreated(created);
+          return;
+        }
+      } else {
+        await serviceTypeRepository.update(+entityId, serviceTypeFormData as UpdateServiceType);
+      }
       navigate('/service-types');
     }
     catch (error: any) {
@@ -72,7 +84,7 @@ function ServiceTypeForm() {
       <div className="w-full max-w-2xl lg:max-w-6xl rounded-[32px] bg-white/75 shadow-2xl backdrop-blur border border-white/60 overflow-hidden">
         <div className="p-3 sm:p-8 lg:p-12">
             <div className="mb-6 sm:mb-8">
-              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{id ? 'Editar dados de serviço' : 'Novo serviço'}</h2>
+              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{entityId ? 'Editar dados de serviço' : 'Novo serviço'}</h2>
               <p className="mt-2 text-xs sm:text-sm text-slate-500 oxanium-400">
                 Preencha as informações para adicionar o serviço ao catálogo.
               </p>

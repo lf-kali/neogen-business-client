@@ -1,5 +1,5 @@
 ## TAREFA
-**Usando as referências de design no arquivo .toon anexado, elabore 3 layouts para o componente UserNavBar, ele deve ficar dentro do componente NeogenNavBar, logo abaixo da AppNavBar, e conter os seguintes elementos:**
+**Usando o componente ProductCategoryDetails como referência de design e layout, Crie o componente ServiceOrderDetails**
 
 (obs.: Exemplos em pseudocódigo para explicar conceitos, converta para elemento html/tsx com estilização em tailwindcss)
 

@@ -1,15 +1,20 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import NeogenInput from "../neogen/keyboard-input/neogen-input/NeogenInput";
 import NeogenButton from "../neogen/neogen-button/NeogenButton";
-import type { CreateCostumer, UpdateCostumer } from "../../features/costumer/costumer.types";
+import type { Costumer, CreateCostumer, UpdateCostumer } from "../../features/costumer/costumer.types";
 import { costumerRepository } from "../../features/costumer/costumer.repository";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-function CustomerForm() {
+type CustomerFormProps = {
+  entityId?: number;
+  onCreated?: (customer: Costumer) => void;
+  onUpdated?: (customer: Costumer) => void;
+};
+
+function CustomerForm({ entityId, onCreated, onUpdated }: CustomerFormProps) {
   const {handleLogout} = useAuth();
   const navigate = useNavigate();
-  const {id} = useParams<{id:string}>();
   
   const [customerFormData, setCustomerFormData ] = useState<CreateCostumer | UpdateCostumer>({
     name: '',
@@ -32,10 +37,10 @@ function CustomerForm() {
     
   }
   useEffect(()=>{
-    if (id) {
-      getCustomer(+id)
+    if (entityId) {
+      getCustomer(+entityId)
     }
-  },[id])
+  },[entityId])
 
   function onInputChange(e: ChangeEvent<HTMLInputElement>) {
     setCustomerFormData({
@@ -49,8 +54,15 @@ function CustomerForm() {
     console.log(customerFormData)
 
     try {
-      if (!id) await costumerRepository.create(customerFormData as CreateCostumer);
-      else await costumerRepository.update(+id, customerFormData as UpdateCostumer);
+      if (!entityId) {
+        const created = await costumerRepository.create(customerFormData as CreateCostumer);
+        if (onCreated) {
+          onCreated(created);
+          return;
+        }
+      } else {
+        await costumerRepository.update(+entityId, customerFormData as UpdateCostumer);
+      }
       navigate('/customers');
     }
     catch (e) {
@@ -74,7 +86,7 @@ function CustomerForm() {
       <div className="w-full max-w-2xl lg:max-w-6xl rounded-[32px] bg-white/75 shadow-2xl backdrop-blur border border-white/60 overflow-hidden">
         <div className="p-3 sm:p-8 lg:p-12">
             <div className="mb-6 sm:mb-8">
-              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{id ? 'Editar dados de cliente' : 'Novo cliente'}</h2>
+              <h2 className="text-xl sm:text-2xl michroma-700 text-[#0f172a]">{entityId ? 'Editar dados de cliente' : 'Novo cliente'}</h2>
               <p className="mt-2 text-xs sm:text-sm text-slate-500 oxanium-400">
                 Preencha as informações para iniciar o relacionamento.
               </p>
