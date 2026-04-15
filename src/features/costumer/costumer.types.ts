@@ -5,6 +5,10 @@ export type Costumer = {
   name: string;
   email?: string;
   phone?: string;
+  address: string;
+  cep: string;
+  cpf: string;
+  cnpj?: string;
   serviceOrders: ServiceOrder[]
 };
 

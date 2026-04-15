@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import type { Costumer } from "../../features/costumer/costumer.types";
 import { costumerRepository } from "../../features/costumer/costumer.repository";
+import DeleteCustomerDialog from "./DeleteCustomerDialog";
+import Popup from "reactjs-popup";
 
 function CostumerDetails() {
   const { id } = useParams<{ id: string }>();
   const [costumer, setCostumer] = useState<Costumer>({} as Costumer);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   async function getCostumerById(id: string) {
     setLoading(true);
@@ -51,35 +54,59 @@ function CostumerDetails() {
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-65">
               <span className="inline-flex items-center rounded-full border border-white/20 px-4 py-1 text-xs uppercase tracking-[0.3em] oxanium-400">
-                Customer Profile
+                Cliente
               </span>
-              <h1 className="mt-5 text-3xl lg:text-4xl michroma-700">
+              <h1 className="mt-5 text-3xl xl:text-3xl michroma-700">
                 {headerTitle}
               </h1>
-              <p className="mt-3 text-sm leading-relaxed text-white/70 oxanium-400">
-                Painel com informações essenciais do cliente para suporte, atendimento e tomada de decisão.
-              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 className="rounded-full bg-white px-5 py-2 text-xs uppercase tracking-[0.22em] text-slate-900 oxanium-700 transition-all hover:bg-slate-100"
+                onClick={() => navigate(`/customers/edit/${id}`)}
               >
                 Editar
               </button>
 
-              <button
-                type="button"
-                className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-xs uppercase tracking-[0.22em] text-red-100 oxanium-400 transition-all hover:bg-red-500/20"
+              <Popup
+                trigger={
+                  <button
+                    type="button"
+                    className="rounded-full border border-red-500/40 bg-red-500/15 px-5 py-2 text-xs uppercase tracking-[0.22em] text-red-100 oxanium-400 transition-all hover:bg-red-500/20"
+                  >
+                    Deletar
+                  </button>
+                }
+                modal
+                closeOnDocumentClick
+                closeOnEscape
+                lockScroll
+                overlayStyle={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                contentStyle={{
+                  borderRadius: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto',
+                  maxWidth: '900px',
+                  width: 'min(500px, 60%)',
+                  background: 'none',
+                  border: 'none'
+                }}
               >
-                Deletar
-              </button>
+                <DeleteCustomerDialog id={costumer.id}/>
+              </Popup>
             </div>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            {["Futurista", "Empresarial", "Centralizado"].map((tag) => (
+            {[`Email: ${costumer.email}`, `Telefone: ${costumer.phone}`, `Ordens de serviço abertas: ${costumer.serviceOrders?.length ?? 0}`,].map((tag) => (
               <span key={tag} className="rounded-full bg-white/10 px-4 py-1 text-xs oxanium-400 text-white/70">
                 {tag}
               </span>

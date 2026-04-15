@@ -1,11 +1,11 @@
-import type { Device } from "../device/device.types";
-import type { DeviceBrand } from "../deviceBrand/deviceBrand.types";
+import type { PortableDevice } from "../device/types/device.types";
+import type { DeviceBrand } from "../deviceBrand/types/deviceBrand.types";
 
 export type DeviceModel = {
   id: number;
   name: string;
   brand: DeviceBrand;
-  devices: Device[];
+  devices: PortableDevice[];
 };
 
 export type CreateDeviceModel = {
