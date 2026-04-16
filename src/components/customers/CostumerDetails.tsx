@@ -4,6 +4,7 @@ import type { Costumer } from "../../features/costumer/costumer.types";
 import { costumerRepository } from "../../features/costumer/costumer.repository";
 import DeleteCustomerDialog from "./DeleteCustomerDialog";
 import Popup from "reactjs-popup";
+import ServiceOrderListItem from "../service-orders/ServiceOrderListItem";
 
 function CostumerDetails() {
   const { id } = useParams<{ id: string }>();
@@ -137,7 +138,7 @@ function CostumerDetails() {
             </div>
           ) : (
             <section className="rounded-3xl border border-slate-200 bg-white/80 p-6 lg:p-8 shadow-sm">
-              <dl className="grid gap-6 md:grid-cols-2">
+              <dl className="grid gap-6 mb-6 md:grid-cols-2">
                 <div>
                   <dt className="text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400">ID</dt>
                   <dd className="mt-2 text-base text-slate-900 oxanium-400">{displayId}</dd>
@@ -160,9 +161,36 @@ function CostumerDetails() {
                   <dd className="mt-2 text-base text-slate-900 oxanium-400">{displayPhone}</dd>
                 </div>
               </dl>
+            </section>
+            
+              
+          )}
+          {costumer?.serviceOrders && costumer.serviceOrders.length > 0 && (
+            <section className="mb-8">
+              <div className="mb-6">
+                <h2 className="text-2xl michroma-700 text-[#0f172a]">Histórico de OS</h2>
+                <p className="mt-2 text-sm text-slate-500 oxanium-400">
+                  Serviços contratados pelo cliente
+                </p>
+              </div>
 
-              <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-xs text-slate-500 oxanium-400">
-                Ordens de serviço e histórico serão exibidos em breve.
+              <div className="rounded-3xl border border-slate-200 bg-white/80 p-6 lg:p-8 shadow-sm overflow-x-auto">
+                <table className="w-full">
+                  <thead className="border-b border-slate-300">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">ID</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Data de Entrada</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Nome Cliente</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Prazo</th>
+                      <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {costumer.serviceOrders.map((so) => (
+                      <ServiceOrderListItem key={so.id} serviceOrder={so} />
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </section>
           )}

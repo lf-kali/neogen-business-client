@@ -4,6 +4,7 @@ import type { ServiceType } from "../../features/serviceType/serviceType.types";
 import { serviceTypeRepository } from "../../features/serviceType/serviceType.repository";
 import Popup from "reactjs-popup";
 import DeleteServiceTypeDialog from "./DeleteServiceTypeDialog";
+import ServiceOrderListItem from "../service-orders/ServiceOrderListItem";
 
 function ServiceTypeDetails() {
   const { id } = useParams<{ id: string }>();
@@ -176,6 +177,35 @@ function ServiceTypeDetails() {
                 </div>
               </dl>
             </section>
+          )}
+          {serviceType?.serviceOrders && serviceType.serviceOrders.length > 0 && (
+                <section className="mb-8">
+                  <div className="mb-6">
+                    <h2 className="text-2xl michroma-700 text-[#0f172a]">Histórico de OS</h2>
+                    <p className="mt-2 text-sm text-slate-500 oxanium-400">
+                      Histórico de ordens de serviço
+                    </p>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-white/80 p-6 lg:p-8 shadow-sm overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="border-b border-slate-300">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">ID</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Data de Entrada</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Nome Cliente</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Prazo</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {serviceType.serviceOrders.map((so) => (
+                          <ServiceOrderListItem key={so.id} serviceOrder={so} />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
           )}
         </div>
       </div>

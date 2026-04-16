@@ -4,6 +4,7 @@ import type { ProductCategory } from "../../features/productCategory/productCate
 import { ProductCategoryRepository } from "../../features/productCategory/productCategory.repository";
 import DeleteProductCategoryDialog from "./DeleteProductCategoryDialog";
 import Popup from "reactjs-popup";
+import ProductListItem from "../product/ProductListItem";
 
 function ProductCategoryDetails() {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +32,7 @@ function ProductCategoryDetails() {
   useEffect(() => {
     if(id !== undefined) {
         getProductCategoryById(id);
+        console.log(productCategory.products)
     }
   },[id])
 
@@ -149,12 +151,38 @@ function ProductCategoryDetails() {
                   </dd>
                 </div>
               </dl>
-
-              <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-xs text-slate-500 oxanium-400">
-                Listagem de produtos e histórico serão exibidos em breve.
-              </div>
             </section>
           )}
+          {productCategory?.products && productCategory.products.length > 0 && (
+                <section className="mb-8">
+                  <div className="mb-6">
+                    <h2 className="text-2xl michroma-700 text-[#0f172a]">Produtos</h2>
+                    <p className="mt-2 text-sm text-slate-500 oxanium-400">
+                      {`Produtos da categoria "${productCategory.name}"`}
+                    </p>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-white/80 p-6 lg:p-8 shadow-sm overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="border-b border-slate-300">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">ID</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Nome</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Preço - Custo</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Preço - Venda</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Estoque</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {productCategory.products.map((product) => (
+                          <ProductListItem key={product.id} product={product} />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
         </div>
       </div>
     </div>

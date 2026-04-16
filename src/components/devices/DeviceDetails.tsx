@@ -6,11 +6,13 @@ import Popup from "reactjs-popup";
 import type { DeviceBrand } from "../../features/deviceBrand/types/deviceBrand.types";
 import type { DeviceModel } from "../../features/deviceModel/deviceModel.types";
 import { portableDeviceSearchRepository } from "../../features/device/repository/portableDeviceSearch.repository";
+import ServiceOrderListItem from "../service-orders/ServiceOrderListItem";
 
 function DeviceDetails() {
   const { id } = useParams<{ id: string }>();
   const [device, setDevice] = useState<PortableDevice>({
     id: 0,
+    entryDate: '',
     problemDescription: '',
     type: undefined,
     brand: {} as DeviceBrand,
@@ -325,6 +327,33 @@ function DeviceDetails() {
               </div>
             </section>
           )}
+          {device?.serviceOrder && (
+                <section className="mb-8">
+                  <div className="mb-6">
+                    <h2 className="text-2xl michroma-700 text-[#0f172a]">Ordem de serviço</h2>
+                    <p className="mt-2 text-sm text-slate-500 oxanium-400">
+                      Ordem de serviço com o dispositivo
+                    </p>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-200 bg-white/80 p-6 lg:p-8 shadow-sm overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="border-b border-slate-300">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">ID</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Nome</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Telefone</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Ordem de Serviços</th>
+                          <th className="px-4 py-3 text-left text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400 font-medium">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ServiceOrderListItem serviceOrder={device.serviceOrder} />
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
         </div>
       </div>
     </div>
