@@ -2,6 +2,8 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Select, { type SingleValue } from "react-select";
 import Popup from "reactjs-popup";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrash, faFileCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../../contexts/AuthContext";
 import type {
   ServiceOrderStatus,
@@ -665,25 +667,28 @@ function ServiceOrderForm() {
                     />
                     <NeogenButton
                       type="button"
-                      style={{ backgroundColor: "#0f172a", minWidth: 120 }}
+                      title="Criar novo dispositivo"
+                      style={{ backgroundColor: "#11bf6b", minWidth: 40, padding: "0.5rem" }}
                       onClick={() => setDeviceModalOpen(true)}
                     >
-                      Criar novo
+                      <FontAwesomeIcon icon={faFileCirclePlus} />
                     </NeogenButton>
                     <NeogenButton
                       type="button"
-                      style={{ backgroundColor: "#374151", minWidth: 140 }}
+                      title="Adicionar linha"
+                      style={{ backgroundColor: "#0f172a", minWidth: 40, padding: "0.5rem" }}
                       onClick={addDeviceRow}
                     >
-                      Adicionar
+                      <FontAwesomeIcon icon={faPlus} />
                     </NeogenButton>
                     {index > 0 && (
                       <NeogenButton
                         type="button"
-                        style={{ backgroundColor: "#dc2626", minWidth: 120 }}
+                        title="Remover"
+                        style={{ backgroundColor: "#dc2626", minWidth: 40, padding: "0.5rem" }}
                         onClick={() => removeDeviceRow(index)}
                       >
-                        Remover
+                        <FontAwesomeIcon icon={faTrash} />
                       </NeogenButton>
                     )}
                   </div>
@@ -721,25 +726,28 @@ function ServiceOrderForm() {
                     />
                     <NeogenButton
                       type="button"
-                      style={{ backgroundColor: "#0f172a", minWidth: 120 }}
+                      title="Criar novo produto"
+                      style={{ backgroundColor: "#11bf6b", minWidth: 40, padding: "0.5rem" }}
                       onClick={() => setProductModalOpen(true)}
                     >
-                      Criar novo
+                      <FontAwesomeIcon icon={faFileCirclePlus} />
                     </NeogenButton>
                     <NeogenButton
                       type="button"
-                      style={{ backgroundColor: "#374151", minWidth: 140 }}
+                      title="Adicionar linha"
+                      style={{ backgroundColor: "#0f172a", minWidth: 40, padding: "0.5rem" }}
                       onClick={addProductRow}
                     >
-                      Adicionar
+                      <FontAwesomeIcon icon={faPlus} />
                     </NeogenButton>
                     {index > 0 && (
                       <NeogenButton
                         type="button"
-                        style={{ backgroundColor: "#dc2626", minWidth: 120 }}
+                        title="Remover"
+                        style={{ backgroundColor: "#dc2626", minWidth: 40, padding: "0.5rem" }}
                         onClick={() => removeProductRow(index)}
                       >
-                        Remover
+                        <FontAwesomeIcon icon={faTrash} />
                       </NeogenButton>
                     )}
                   </div>
@@ -777,25 +785,28 @@ function ServiceOrderForm() {
                     />
                     <NeogenButton
                       type="button"
-                      style={{ backgroundColor: "#0f172a", minWidth: 120 }}
+                      title="Criar novo serviço"
+                      style={{ backgroundColor: "#11bf6b", minWidth: 40, padding: "0.5rem" }}
                       onClick={() => setServiceTypeModalOpen(true)}
                     >
-                      Criar novo
+                      <FontAwesomeIcon icon={faFileCirclePlus} />
                     </NeogenButton>
                     <NeogenButton
                       type="button"
-                      style={{ backgroundColor: "#374151", minWidth: 140 }}
+                      title="Adicionar linha"
+                      style={{ backgroundColor: "#0f172a", minWidth: 40, padding: "0.5rem" }}
                       onClick={addServiceTypeRow}
                     >
-                      Adicionar
+                      <FontAwesomeIcon icon={faPlus} />
                     </NeogenButton>
                     {index > 0 && (
                       <NeogenButton
                         type="button"
-                        style={{ backgroundColor: "#dc2626", minWidth: 120 }}
+                        title="Remover"
+                        style={{ backgroundColor: "#dc2626", minWidth: 40, padding: "0.5rem" }}
                         onClick={() => removeServiceTypeRow(index)}
                       >
-                        Remover
+                        <FontAwesomeIcon icon={faTrash} />
                       </NeogenButton>
                     )}
                   </div>

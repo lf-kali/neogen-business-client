@@ -36,7 +36,7 @@ function DeviceListItem({ device }: DeviceListItemProps) {
       {/* CLIENTE RESPONSÁVEL */}
       <td className="px-4 py-3 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/devices/${device.id}`)}>
         <span className="text-sm text-slate-600 oxanium-400">
-          {device.serviceOrder?.costumer?.name ?? '--'}
+          {device.serviceOrders?.costumer?.name ?? '--'}
         </span>
       </td>
 
@@ -47,7 +47,7 @@ function DeviceListItem({ device }: DeviceListItemProps) {
           <Link
             to={`/devices/edit/${device.id}`}
             className="p-1.5 rounded hover:bg-blue-100 text-slate-600 hover:text-blue-600 transition-colors"
-            aria-label={`Editar ${device.model?.name ?? '--'} de ${device.serviceOrder?.costumer?.name ?? '--'}`}
+            aria-label={`Editar ${device.model?.name ?? '--'} de ${device.serviceOrders?.costumer?.name ?? '--'}`}
           >
             <svg
               width="16"
@@ -68,7 +68,7 @@ function DeviceListItem({ device }: DeviceListItemProps) {
             trigger={
               <button
                 className="p-1.5 rounded hover:bg-red-100 text-slate-600 hover:text-red-600 transition-colors cursor-pointer"
-                aria-label={`Deletar ${device.model?.name ?? '--'} de ${device.serviceOrder?.costumer?.name ?? '--'}`}
+                aria-label={`Deletar ${device.model?.name ?? '--'} de ${device.serviceOrders?.costumer?.name ?? '--'}`}
               >
                 <svg
                   width="16"

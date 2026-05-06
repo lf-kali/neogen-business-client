@@ -12,7 +12,7 @@ export interface PortableDevice {
   model: DeviceModel;
   initialDiagnosis: InitialDiagnosis;
   handedAccessories: HandedAccessories;
-  serviceOrder?: ServiceOrder;
+  serviceOrders?: ServiceOrder[];
   type?: DeviceCategory,
 };
 

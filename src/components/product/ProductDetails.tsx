@@ -144,7 +144,7 @@ function ProductDetails() {
               />
             </div>
           ) : (
-            <section className="rounded-3xl border border-slate-200 bg-white/80 p-6 lg:p-8 shadow-sm">
+            <section className="rounded-3xl border border-slate-200 bg-white/80 p-6 lg:p-8 shadow-sm mb-10">
               <dl className="grid gap-6 md:grid-cols-2">
                 <div>
                   <dt className="text-xs uppercase tracking-[0.22em] text-slate-400 oxanium-400">ID</dt>

@@ -9,6 +9,7 @@ import DeviceListItem from "../devices/DeviceListItem";
 import ProductListItem from "../product/ProductListItem";
 import ServiceTypeListItem from "../serviceTypes/ServiceTypeListItem";
 import type { PortableDevice } from "../../features/device/types/device.types";
+import { generateServiceOrderPDF, type CompanyInfo } from "../../utils/generateServiceOrderPDF_1";
 
 function ServiceOrderDetails() {
   const {id} = useParams<{ id: string }>();
@@ -17,6 +18,12 @@ function ServiceOrderDetails() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const companyInfo: CompanyInfo = {
+    name: 'Neogen Informática',
+    phone: '(51) 98917-0627',
+    email: 'neogen.informática@gmail.com',
+  }
 
   async function getServiceOrderById(id: string) {
     setLoading(true);
@@ -86,6 +93,13 @@ function ServiceOrderDetails() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                className="rounded-full bg-white px-5 py-2 text-xs uppercase tracking-[0.22em] text-slate-900 oxanium-700 transition-all hover:bg-slate-100"
+                onClick={() => generateServiceOrderPDF(serviceOrder, companyInfo, '../../../public/pfp-neogen.png')}
+              >
+                Imprimir
+              </button>
               <button
                 type="button"
                 className="rounded-full bg-white px-5 py-2 text-xs uppercase tracking-[0.22em] text-slate-900 oxanium-700 transition-all hover:bg-slate-100"
